@@ -2,26 +2,39 @@ import React, { Component } from 'react';
 import "./Content.css"
 
 class Content extends Component {
+    constructor(){
+        super();
+        this.state = {dogs:[]};
+    }
+
+    componentDidMount(){
+        this.refreshDogImage();
+    }
+
+    refreshDogImage(){
+        var image = [];
+        for (var i = 0; i < 4; i++){
+            fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
+                .then(data => data.json())
+                .then(data => {
+                    image.push(data);
+                    this.setState({dogs:image})
+                });
+        }
+    }
+
     render() {
-        const placeHolder = "http://via.placeholder.com/350x350";
+        console.log(this.state.dogs);
         return (
             <div className="Content container-fluid">
                 <div className="row">
-                    <div className="col-md-3">
-                        <img className="img-responsive" src= {placeHolder} style={{width:100 + "%"}}/>
-                    </div>
-
-                    <div className="col-md-3">
-                        <img className="img-responsive" src= {placeHolder} style={{width:100 + "%"}}/>
-                    </div>
-
-                    <div className="col-md-3">
-                        <img className="img-responsive" src= {placeHolder} style={{width:100 + "%"}}/>
-                    </div>
-
-                    <div className="col-md-3">
-                        <img className="img-responsive" src= {placeHolder} style={{width:100 + "%"}}/>
-                    </div>
+                    {
+                        this.state.dogs.map(dog => (
+                            <div className="col-md-3" key={dog.message}>
+                                <img className="img-responsive" src= {dog.message} style={{width:100 + "%"}}/>
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
         );
