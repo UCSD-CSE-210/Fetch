@@ -1,0 +1,40 @@
+.Header-header {
+  background-color: #3F51B5;
+  height: auto;
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+
+.Header-logo {
+  animation: Header-logo-spin infinite 1s linear;
+  height: 80px;
+}
+
+.Header-title {
+  font-size: 1.5em;
+}
+
+.Header-intro {
+  font-size: large;
+}
+
+@keyframes Header-logo-spin {
+    0%{transform: rotate(20deg);}
+    50%{transform: rotate(-10deg);}
+    100%{transform: rotate(20deg);}
+}
+
+.btn-header{
+    color: #ffffff;
+    background-color: #E91E63;
+    border-color: #D81B60;
+    transition: transform 0.2s;
+}
+
+.btn-header:hover{
+    background-color: #E53935;
+    transform: scale(1.1);
+}
+
+
