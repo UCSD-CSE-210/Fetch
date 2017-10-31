@@ -14,9 +14,12 @@ Fetch Flask App
 #### Installing PostgreSQL locally
 
 ```
+wget https://ftp.postgresql.org/pub/source/v10.0/postgresql-10.0.tar.gz
+tar xf postgresql-10.0.tar.gz
+cd postgresql-10.0
+# installs locally to ~/postgres
 ./configure --prefix=$HOME/postgres/ --with-python PYTHON=/usr/bin/python2.7
 make -j
 make install
-...
 ~/postgres/bin/initdb -D ~/postgres/data/
 ```
