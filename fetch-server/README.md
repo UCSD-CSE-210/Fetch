@@ -11,3 +11,12 @@ Fetch Flask App
 4. Start the server
     - `FLASK_APP=fetch.py flask run`
 
+#### Installing PostgreSQL locally
+
+```
+./configure --prefix=$HOME/postgres/ --with-python PYTHON=/usr/bin/python2.7
+make -j
+make install
+...
+~/postgres/bin/initdb -D ~/postgres/data/
+```
