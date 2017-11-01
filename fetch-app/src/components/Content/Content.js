@@ -32,10 +32,10 @@ class Content extends Component {
               <div id="posts">
                 <PostsRender />
               </div>
-            </body>
-            <div className="Content container-fluid">
+              <div className="Content container-fluid">
                 <SearchResult />
-            </div>
+              </div>
+            </body>
         );
     }
 }

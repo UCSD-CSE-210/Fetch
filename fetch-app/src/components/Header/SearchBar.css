@@ -25,6 +25,12 @@ button[type="search"] {
   border: none;
   border-bottom-right-radius: 5px;
   border-top-right-radius: 5px;
+  color: #FFFFFF;
   font-size: 14pt;
   width: 20%;
+}
+
+button[type="search"]:hover {
+  background: #FFFFFF;
+  color: #000000;
 }
