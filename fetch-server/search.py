@@ -1,5 +1,5 @@
 from models.route import Route, RouteAdmin
-from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape
 import utils
 
@@ -10,10 +10,10 @@ parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 parser.add_argument('id'             , type=int,  store_missing=False)
 parser.add_argument('name'           , type=str,  store_missing=False)
 parser.add_argument('address'        , type=str,  store_missing=False)
-parser.add_argument('is_shade'       , type=bool, store_missing=False)
-parser.add_argument('is_water'       , type=bool, store_missing=False)
-parser.add_argument('is_garbage_can' , type=bool, store_missing=False)
-parser.add_argument('is_poop_bag'    , type=bool, store_missing=False)
+parser.add_argument('is_shade'       , type=inputs.boolean, store_missing=False)
+parser.add_argument('is_water'       , type=inputs.boolean, store_missing=False)
+parser.add_argument('is_garbage_can' , type=inputs.boolean, store_missing=False)
+parser.add_argument('is_poop_bag'    , type=inputs.boolean, store_missing=False)
 
 # JSON response
 # { 'results' : [ route1, route2, ...] }
