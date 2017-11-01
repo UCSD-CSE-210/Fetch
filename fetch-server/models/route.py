@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
-from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.geoa import ModelView
 from flask_security import current_user
+from geoalchemy2.types import Geometry
 
 try:
     from .. import utils
@@ -20,6 +21,8 @@ class Route(db.Model):
     is_water       = db.Column(db.Boolean())
     is_garbage_can = db.Column(db.Boolean())
     is_poop_bag    = db.Column(db.Boolean())
+
+    path           = db.Column(Geometry("LINESTRING"))
 
     def __str__(self):
         return self.name

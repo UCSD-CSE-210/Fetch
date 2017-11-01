@@ -1,5 +1,6 @@
 from models.route import Route, RouteAdmin
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+from geoalchemy2.shape import to_shape
 import utils
 
 api = utils.get_api()
@@ -17,6 +18,12 @@ parser.add_argument('is_poop_bag'    , type=bool, store_missing=False)
 # JSON response
 # { 'results' : [ route1, route2, ...] }
 # where each route has the following fields:
+
+class Coordinates(fields.Raw):
+    def format(self, wkb):
+        coords = to_shape(wkb).coords[:]
+        return map(lambda (x,y): [x,y], coords)
+
 route_fields = {
     'id'             : fields.Integer,
     'name'           : fields.String,
@@ -24,7 +31,8 @@ route_fields = {
     'is_shade'       : fields.Boolean,
     'is_water'       : fields.Boolean,
     'is_garbage_can' : fields.Boolean,
-    'is_poop_bag'    : fields.Boolean
+    'is_poop_bag'    : fields.Boolean,
+    'coodinates'     : Coordinates(attribute='path')
 }
 
 # filter & respond to the search query
@@ -32,7 +40,7 @@ class RouteSearch(Resource):
     @marshal_with(route_fields, envelope='results')
     def get(self):
         args = parser.parse_args(strict=True)
-        print args
+        print "args:", args
         if 'id' not in args:
             q = Route.query
             if 'name' in args:
@@ -43,7 +51,8 @@ class RouteSearch(Resource):
                 address = args['address']
                 args.pop('address')
                 q = q.filter(Route.address.ilike('%'+address+'%'))
-            return q.filter_by(**args).all()
+            results = q.filter_by(**args).all()
+            return results
         else:
             route = Route.query.get(args['id'])
             return [route] if route is not None else []
