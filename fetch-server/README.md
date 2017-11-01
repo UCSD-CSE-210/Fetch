@@ -30,7 +30,7 @@ To start the db server:
 ~/postgres/bin/pg_ctl -D ~/postgres/data/ -l /tmp/pg-logfile start
 ```
 
-To set up the database (username: fetch_db, password: fetch_db):
+To set up the database (username: `fetch_db`, password: `fetch_db`):
 
 ``` shell
 > ~/postgres/bin/psql postgres
@@ -61,7 +61,7 @@ PATH="$HOME/postgres/bin:$PATH" make install
 ```
 
 ```shell
-> ~/postgres/bin/psql fetch
+> ~/postgres/bin/psql fetch_db
 
 CREATE EXTENSION postgis;
 \q
