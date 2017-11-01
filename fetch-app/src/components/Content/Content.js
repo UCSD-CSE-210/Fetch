@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import "./Content.css"
 import PostsRender from './PostsRender'
+import SearchResult from './SearchResult'
 
 class Content extends Component {
     constructor(){
@@ -33,15 +34,7 @@ class Content extends Component {
               </div>
             </body>
             <div className="Content container-fluid">
-                <div className="row">
-                    {
-                        this.state.dogs.map(dog => (
-                            <div className="col-md-3" key={dog.message}>
-                                <img className="img-responsive" src= {dog.message} style={{width:100 + "%"}}/>
-                            </div>
-                        ))
-                    }
-                </div>
+                <SearchResult />
             </div>
         );
     }
