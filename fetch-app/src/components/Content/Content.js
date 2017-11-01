@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import "./Content.css"
+import PostsRender from './PostsRender'
 
 class Content extends Component {
     constructor(){
@@ -26,6 +27,11 @@ class Content extends Component {
     render() {
         console.log(this.state.dogs);
         return (
+            <body>
+              <div id="posts">
+                <PostsRender />
+              </div>
+            </body>
             <div className="Content container-fluid">
                 <div className="row">
                     {
