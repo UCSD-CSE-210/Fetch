@@ -2,6 +2,7 @@ import utils
 from fetch import app, user_datastore
 from models.user import Role
 from models.route import Route
+from models.wildlife import WildlifeType
 from shapely.geometry import LineString
 from geoalchemy2.shape import from_shape
 
@@ -41,8 +42,16 @@ def build_sample_db(db):
                        is_shade       = False,
                        is_water       = True,
                        path           = from_shape(LineString(path2)))
+        
+        rattlesnake = WildlifeType(name = "Rattlesnake",
+                                   is_dangerous = True)
+
+        #rattlesnake_instance = Wildlife(wildlifetype_id = rattlesnake.id)
+
         db.session.add(route1)
         db.session.add(route2)
+        db.session.add(rattlesnake)
+        #db.session.add(rattlesnake_instance)
         db.session.commit()
 
     return

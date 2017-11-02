@@ -4,8 +4,12 @@ from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from models.user import User, Role, UserAdmin
 from models.route import Route, RouteAdmin
+from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
+
 import utils
-import search
+
+import resources
+
 from flask_security import SQLAlchemyUserDatastore, Security, login_required
 
 app = utils.get_app()
@@ -22,6 +26,8 @@ security = Security(app, user_datastore)
 admin = Admin(app, name='fetch', template_mode='bootstrap3')
 admin.add_view(UserAdmin(User, db.session))
 admin.add_view(RouteAdmin(Route, db.session))
+admin.add_view(WildlifeTypeAdmin(WildlifeType, db.session))
+admin.add_view(WildlifeAdmin(Wildlife, db.session))
 
 # displays the home page.
 @app.route('/')
