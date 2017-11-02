@@ -1,43 +1,17 @@
-import React, { Component } from 'react';
+import React from 'react';
 import "./Content.css"
 import PostsRender from './PostsRender'
-import SearchResult from './SearchResult'
 
-class Content extends Component {
-    constructor(){
-        super();
-        this.state = {dogs:[]};
-    }
-
-    componentDidMount(){
-        this.refreshDogImage();
-    }
-
-    refreshDogImage(){
-        var image = [];
-        for (var i = 0; i < 4; i++){
-            fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
-                .then(data => data.json())
-                .then(data => {
-                    image.push(data);
-                    this.setState({dogs:image})
-                });
-        }
-    }
+class Content extends React.Component {
 
     render() {
-        console.log(this.state.dogs);
         return (
-            <body>
-              <div id="posts">
+            <div id="posts">
                 <PostsRender />
-              </div>
-              <div className="Content container-fluid">
-                <SearchResult />
-              </div>
-            </body>
+            </div>
         );
     }
+
 }
 
 export default Content;

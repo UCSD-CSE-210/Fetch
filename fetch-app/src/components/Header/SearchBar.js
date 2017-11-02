@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import "./SearchBar.css"
 
 class SearchBar extends React.Component {
@@ -23,7 +23,7 @@ class SearchBar extends React.Component {
           onChange = {this.updateText}
         />
         <button type = "search">
-          <i class="fa fa-search"></i>
+          <i className="fa fa-search"></i>
         </button>
       </form>
     );

@@ -2,8 +2,3 @@
   display: flex;
   justify-content: center;
 }
-
-img[class='post']{
-  max-width:100%;
-  max-height:100%;
-}
