@@ -1,6 +1,6 @@
 from models.route import Route, RouteAdmin
 from models.wildlife import WildlifeType, Wildlife
-from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
 
@@ -17,24 +17,26 @@ search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 search_parser.add_argument('id'             , type=int,  store_missing=False)
 search_parser.add_argument('name'           , type=str,  store_missing=False)
 search_parser.add_argument('address'        , type=str,  store_missing=False)
-search_parser.add_argument('is_shade'       , type=bool, store_missing=False)
-search_parser.add_argument('is_water'       , type=bool, store_missing=False)
-search_parser.add_argument('is_garbage_can' , type=bool, store_missing=False)
-search_parser.add_argument('is_poop_bag'    , type=bool, store_missing=False)
+search_parser.add_argument('is_shade'       , type=inputs.boolean, store_missing=False)
+search_parser.add_argument('is_water'       , type=inputs.boolean, store_missing=False)
+search_parser.add_argument('is_garbage_can' , type=inputs.boolean, store_missing=False)
+search_parser.add_argument('is_poop_bag'    , type=inputs.boolean, store_missing=False)
 
 # GET parameters for wildlife
 wildlife_type_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
-wildlife_type_parser.add_argument('is_dangerous', type=bool, store_missing=False)
+wildlife_type_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
+wildlife_type_parser.add_argument('name', type=str, store_missing=False)
 
 # POST parameters for wildlife types
 wildlife_type_post_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
-wildlife_type_post_parser.add_argument('is_dangerous', type=bool, store_missing=False)
+wildlife_type_post_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
 wildlife_type_post_parser.add_argument('name', type=str, store_missing=False)
 
 # POST parameters for wildlife instances
 wildlife_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 wildlife_parser.add_argument('wildlifetype', type=int, store_missing=False)
 wildlife_parser.add_argument('location', type=dict, store_missing=False)
+wildlife_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
 
 # JSON response
 # { 'results' : [ route1, route2, ...] }
@@ -107,6 +109,10 @@ class RouteResource(Resource):
 
 
 class WildlifeTypeResource(Resource):
+    '''
+    Query parameters:
+    1. is_dangerous - optional boolean
+    '''
     @marshal_with(wildlife_type_fields, envelope='results')
     def get(self):
         args = wildlife_type_parser.parse_args(strict=True)
@@ -114,6 +120,13 @@ class WildlifeTypeResource(Resource):
         results = q.filter_by(**args).all()
         return results
     
+    '''
+    JSON payload
+    {
+        "name": "raccoon",
+        "is_dangerous": true
+    }
+    '''
     @marshal_with(wildlife_type_fields, envelope='results')
     def post(self):
         args = wildlife_type_post_parser.parse_args(strict=True)
@@ -124,15 +137,32 @@ class WildlifeTypeResource(Resource):
         return wt
 
 class WildlifeResource(Resource):
+    '''
+    Query parameters:
+    1. is_dangerous - optional boolean
+    2. name - optional string
+    '''
     @marshal_with(wildlife_fields, envelope='results')
     def get(self):
-        return Wildlife.query.order_by(Wildlife.id).all()
+        args = wildlife_parser.parse_args(strict=True)
+        if 'is_dangerous' in args:
+            return Wildlife.query.filter(Wildlife.wildlifetype.has(is_dangerous=args['is_dangerous'])).all()
+        else:
+            return Wildlife.query.all()
 
-    
+    '''
+    JSON payload
+    {
+        "wildlifetype": 1,
+        "location": {
+            "latitude": 100.0,
+            "longitude": 123.23
+        }
+    }
+    '''
     @marshal_with(wildlife_fields, envelope='results')
     def post(self):
         args = wildlife_parser.parse_args(strict=True)
-        print args
         point = [args['location']['latitude'], args['location']['longitude']]
         wildlife = Wildlife(wildlifetype_id = args['wildlifetype'],
                             location = from_shape(Point(point)))
