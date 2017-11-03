@@ -1,5 +1,5 @@
 .Header-header {
-  background-color: #3F51B5;
+  background-color: #000000;
   height: auto;
   padding: 20px;
   color: white;
@@ -36,5 +36,3 @@
     background-color: #E53935;
     transform: scale(1.1);
 }
-
-

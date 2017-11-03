@@ -1,0 +1,27 @@
+.post-card{
+  box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19);
+  margin: 16px!important;
+  color:#000!important;
+  background-color:#fff!important;
+}
+
+.container{
+  padding:0.01em 16px;
+}
+
+.opacity{
+  opacity:0.60;
+}
+
+.ratings{
+  float:right!important;
+}
+
+.tag{
+  background-color:#000;
+  color:#fff;
+  display:inline-block;
+  padding-left:8px;
+  padding-right:8px;
+  text-align:center
+}
