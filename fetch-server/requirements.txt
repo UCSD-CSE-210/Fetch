@@ -4,6 +4,7 @@ bcrypt==3.1.4
 blinker==1.4
 cffi==1.11.2
 click==6.7
+Django==1.11.7
 Flask==0.12.2
 Flask-Admin==1.5.0
 Flask-BabelEx==0.9.3
@@ -13,12 +14,16 @@ Flask-Principal==0.4.0
 Flask-RESTful==0.3.6
 Flask-Security==3.0.0
 Flask-SQLAlchemy==2.3.2
+Flask-Uploads==0.2.1
 Flask-WTF==0.14.2
 GeoAlchemy2==0.4.0
+image==1.5.16
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
+olefile==0.44
 passlib==1.7.1
+Pillow==4.3.0
 psycopg2==2.7.3.2
 pycparser==2.18
 python-dateutil==2.6.1

@@ -59,3 +59,11 @@ def build_sample_db(db):
 if __name__ == '__main__':
     db = utils.get_db()
     build_sample_db(db)
+
+    app = utils.get_app()
+
+    try:
+        os.makedirs(app.config['FS_IMAGES_ROOT'])
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
