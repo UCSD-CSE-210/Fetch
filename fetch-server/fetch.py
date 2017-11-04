@@ -1,11 +1,12 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request, jsonify, abort, url_for
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
-from models.user import User, Role, UserAdmin
-from models.route import Route, RouteAdmin
-from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 from models.image import Image, ImageAdmin
+from models.route import Route, RouteAdmin
+from models.user import User, Role, UserAdmin
+from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
 
 import utils
 
@@ -31,6 +32,9 @@ admin.add_view(WildlifeTypeAdmin(WildlifeType, db.session))
 admin.add_view(WildlifeAdmin(Wildlife, db.session))
 admin.add_view(ImageAdmin(Image, db.session))
 
+images = UploadSet('images', IMAGES)
+configure_uploads(app, images)
+
 # displays the home page.
 @app.route('/')
 # Users must be authenticated to view the home page, but they don't have to have any particular role.
@@ -39,8 +43,30 @@ admin.add_view(ImageAdmin(Image, db.session))
 def index():
     return render_template('index.html')
 
-@app.route('/images/<path:filename>')
-def download_image(filename):
+@login_required
+@app.route('/image/<int:image_id>')
+def download_image(image_id):
+    image = Image.query.get(image_id)
+    if image is None:
+        abort(404)
     return send_from_directory(app.config['FS_IMAGES_ROOT'],
-                               filename,
-                               as_attachment=True)
+                               image.path,
+                               as_attachment=False)
+
+@login_required
+@app.route('/upload_image', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        if 'image' in request.files:
+            path = images.save(request.files['image'])
+            image = Image(path=path)
+            db.session.add(image)
+            db.session.commit()
+            return jsonify({'result': 'success',
+                            'image': {'id': image.id,
+                                      'url': url_for('download_image',
+                                                     image_id=image.id)}})
+        return jsonify({'result': 'failure'})
+    else:
+        return render_template('upload.html')
+

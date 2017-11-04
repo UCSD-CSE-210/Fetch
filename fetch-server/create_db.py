@@ -5,6 +5,7 @@ from models.route import Route
 from models.wildlife import WildlifeType
 from shapely.geometry import LineString
 from geoalchemy2.shape import from_shape
+import os, errno
 
 def build_sample_db(db):
     db.drop_all()
