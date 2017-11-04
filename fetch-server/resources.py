@@ -1,5 +1,6 @@
 from models.route import Route, RouteAdmin
 from models.wildlife import WildlifeType, Wildlife
+from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
@@ -62,6 +63,12 @@ class LocationField(fields.Raw):
             'longitude' : point[0][1]
         }
 
+class ImageField(fields.Raw):
+    def format(self, imgs):
+        return map(lambda img: {'image_id': img.id,
+                                'image_url': url_for('download_image', image_id=img.id)},
+                   imgs)
+
 route_fields = {
     'id'             : fields.Integer,
     'name'           : fields.String,
@@ -70,7 +77,8 @@ route_fields = {
     'is_water'       : fields.Boolean,
     'is_garbage_can' : fields.Boolean,
     'is_poop_bag'    : fields.Boolean,
-    'coodinates'     : Coordinates(attribute='path')
+    'coodinates'     : Coordinates(attribute='path'),
+    'images'         : ImageField(attribute='images')
 }
 
 wildlife_type_fields = {

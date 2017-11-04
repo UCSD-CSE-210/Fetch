@@ -44,7 +44,7 @@ def index():
     return render_template('index.html')
 
 @login_required
-@app.route('/image/<int:image_id>')
+@app.route('/api/image/<int:image_id>')
 def download_image(image_id):
     image = Image.query.get(image_id)
     if image is None:
@@ -53,20 +53,37 @@ def download_image(image_id):
                                image.path,
                                as_attachment=False)
 
+def failure_msg(msg):
+    return jsonify({'result': 'failure',
+                    'message': msg })
+
 @login_required
-@app.route('/upload_image', methods=['GET', 'POST'])
-def upload():
+@app.route('/api/upload_image', methods=['GET', 'POST'])
+def upload_image():
+    print request.args
+    print request.files
     if request.method == 'POST':
-        if 'image' in request.files:
-            path = images.save(request.files['image'])
-            image = Image(path=path)
-            db.session.add(image)
-            db.session.commit()
-            return jsonify({'result': 'success',
-                            'image': {'id': image.id,
-                                      'url': url_for('download_image',
-                                                     image_id=image.id)}})
-        return jsonify({'result': 'failure'})
+        route_id = request.form.get('route_id', default=-1, type=int)
+
+        if route_id < 0 or 'image' not in request.files:
+            return failure_msg('Missing parameter(s)')
+
+        route = Route.query.get(route_id)
+
+        if route is None:
+            return failure_msg('Route "%d" does not exist' % (route_id))
+
+        path = images.save(request.files['image'])
+        image = Image(path=path)
+        route.images.append(image)
+        db.session.add(image)
+        db.session.add(route)
+        db.session.commit()
+
+        return jsonify({'result': 'success',
+                        'image': {'id': image.id,
+                                  'url': url_for('download_image',
+                                                 image_id=image.id)}})
     else:
         return render_template('upload.html')
 

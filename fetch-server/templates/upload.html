@@ -1,7 +1,8 @@
 <html>
   <body>
-    <form action="/upload_image" method="POST" enctype="multipart/form-data">
-      <input type="file" name="image" />
+    <form action="{{ url_for('upload_image') }}" method="POST" enctype="multipart/form-data">
+      Image: <input type="file" name="image" /> <br/>
+      Route id: <input type="text" name="route_id" /> <br/>
       <input type="submit"/>
     </form>
   </body>

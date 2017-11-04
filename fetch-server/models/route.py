@@ -12,6 +12,7 @@ except ValueError:
 db = utils.get_db()
 
 class Route(db.Model):
+    __tablename__ = 'route'
     id = db.Column(db.Integer, primary_key=True)
 
     name           = db.Column(db.String(255))
@@ -23,6 +24,8 @@ class Route(db.Model):
     is_poop_bag    = db.Column(db.Boolean())
 
     path           = db.Column(Geometry("LINESTRING"))
+
+    images         = db.relationship('Image')
 
     def __str__(self):
         return self.name

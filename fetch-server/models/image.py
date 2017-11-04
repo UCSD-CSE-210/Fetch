@@ -16,18 +16,20 @@ db  = utils.get_db()
 app = utils.get_app()
 
 class Image(db.Model):
-    id   = db.Column(db.Integer, primary_key=True)
-    path = db.Column(db.Unicode(255))
+    __tablename__ = 'image'
+    id       = db.Column(db.Integer, primary_key=True)
+    path     = db.Column(db.Unicode(255))
+    route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
 
     def __unicode__(self):
-        return str(integer).encode("utf-8").decode("utf-8") + path
+        prefix = str(self.id) + ":"
+        return prefix.encode("utf-8").decode("utf-8") + self.path
 
     def get_fullpath(self):
         return op.join(app.config['FS_IMAGES_ROOT'], self.path)
 
 class ImageAdmin(ModelView):
-    column_list = ('id', 'path', 'image')
-    can_edit = False
+    column_list = ('path', 'image')
 
     def _list_thumbnail(view, context, model, value):
         if not model.path:
