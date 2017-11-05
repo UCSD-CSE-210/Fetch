@@ -79,22 +79,37 @@ class Post extends React.Component {
                      "-117.234104275703,32.8817946493596,13.67/500x300@2x?" +
                      `access_token=${this.token}`;
         var info = this.props.value;
+
         return (
-            <div className="post-card">
-                <div className="container">
-                    <h3><b>{info.title}</b></h3>
-                    <h5><span className="opacity">{info.date}</span>
+            <div className="post-card container">
+                <h3><b>{info.title}</b></h3>
+                <h5>
+                    <span className="opacity">{info.date}</span>
                         <span className="ratings">
                             <b>Ratings  </b>
-                            <span className="tag">{info.ratings}</span>
-                        </span>
-                    </h5>
-                </div>
-                <div className="post-imgs">
-                    <img className='map' src={mapURL}/>
-                </div>
-                <div className="container">
-                    <p>{info.description}</p>
+                        <span className="tag">{info.ratings}</span>
+                    </span>
+                </h5>
+
+                <div className="row">
+                    <div className="col-sm-4">
+                        <div>
+                            <p>{info.description}</p>
+                        </div>
+                        <div className="post-img">
+                            <img className="map img-responsive" src={this.state.imgs} alt="dog img on trail"/>
+                        </div>
+                    </div>
+
+                    <div className="col-sm-8">
+                        <div className="post-img">
+                            <img className='map img-responsive' alt="trail map" src={mapURL}/>
+                        </div>
+                        <div>
+                            <button className="btn btn-primary col-sm-12 post-btn">Upload pictures of wildlife</button>
+                            <button className="btn btn-primary col-sm-12 post-btn">Capture pictures of dogs</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
