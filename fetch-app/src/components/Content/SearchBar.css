@@ -1,6 +1,7 @@
-div[id="searchBar"] {
-  display: flex;
-  justify-content: center;
+.fulldiv {
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 form {
@@ -33,4 +34,10 @@ button[type="search"] {
 button[type="search"]:hover {
   background: #FFFFFF;
   color: #000000;
+}
+
+.checkbox {
+    padding-top: 5px;
+    color: #FFFFFF;
+    justify-content: center;
 }

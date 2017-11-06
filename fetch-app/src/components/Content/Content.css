@@ -1,3 +1,4 @@
-.Content{
-    padding: 20px;
+div[id="searchBar"] {
+  background-color: #292929;
+  padding-bottom: 20px;
 }

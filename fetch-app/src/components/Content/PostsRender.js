@@ -7,20 +7,7 @@ class PostsRender extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            items : [
-                {
-                    title : 'Trail 1',
-                    date : 'November 1 2017',
-                    ratings : '5.0',
-                    description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
-                },
-                {
-                    title : 'Trail 2',
-                    date : 'November 1 2017',
-                    ratings : '4.8',
-                    description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
-                }
-            ]
+            items : [],
         };
         this.lastScrollY = 0;
         this.handleScroll = this.handleScroll.bind(this);
@@ -28,6 +15,7 @@ class PostsRender extends React.Component {
 
     componentDidMount() {
         setInterval(this.handleScroll, 200);
+        this.setState({items: this.state.items.concat(this.props.items)});
     }
 
     isScrolling() {
@@ -44,15 +32,13 @@ class PostsRender extends React.Component {
             this.lastScrollY = window.scrollY;
         }
         if (this.isScrolling()) {
-            var data = {
-                title : 'Trail',
-                date : 'November 1 2017',
-                ratings : '4.8',
-                description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
-            }
-            if(this.state.items.length < 20){
-                this.setState({items : this.state.items.concat(data)});
-            }
+            // if (this.state.items.length >= 10)
+            //     return;
+            // fetch("http://192.168.1.65:4000/search")
+            //     .then(data => data.json())
+            //     .then(data => {
+            //         this.setState({items : this.state.items.concat(data)});
+            //     });
         }
     }
 

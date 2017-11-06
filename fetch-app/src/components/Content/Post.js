@@ -21,65 +21,11 @@ class Post extends React.Component {
     }
 
     render() {
-        var path = [
-                    [
-                        -117.233954071999,
-                        32.8820469288637
-                    ],
-                    [
-                        -117.234104275703,
-                        32.8817946493596
-                    ],
-                    [
-                        -117.234104275703,
-                        32.8809927561667
-                    ],
-                    [
-                        -117.235563397408,
-                        32.8809927561667
-                    ],
-                    [
-                        -117.237580418587,
-                        32.879307855821
-                    ],
-                    [
-                        -117.237569689751,
-                        32.8791907225207
-                    ],
-                    [
-                        -117.238685488701,
-                        32.8781455262187
-                    ],
-                    [
-                        -117.238827645779,
-                        32.8781365158522
-                    ],
-                    [
-                        -117.238913476467,
-                        32.8775508400632
-                    ],
-                    [
-                        -117.239235341549,
-                        32.8776184182363
-                    ]
-                ];
-        var g = {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": path,
-                    },
-                    "properties": {
-                        "stroke":"blue",
-                        "stroke-width":"3",
-                    },
-                };
-        var mapURL = "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
-                     'geojson(' + encodeURIComponent(JSON.stringify(g)) + ')/' +
-                     "-117.234104275703,32.8817946493596,13.67/500x300@2x?" +
-                     `access_token=${this.token}`;
         var info = this.props.value;
-
+        var mapURL = "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
+                     'geojson(' + encodeURIComponent(JSON.stringify(info.geojson)) + ')/' +
+                     `${info.viewpoint}/500x300?` +
+                     `access_token=${this.token}`;
         return (
             <div className="post-card container">
                 <h3><b>{info.title}</b></h3>
