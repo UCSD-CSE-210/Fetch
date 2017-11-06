@@ -52,8 +52,22 @@ class Post extends React.Component {
                             <img className='map img-responsive' alt="trail map" src={mapURL}/>
                         </div>
                         <div>
-                            <button className="btn btn-primary col-sm-12 post-btn">Upload pictures of wildlife</button>
-                            <button className="btn btn-primary col-sm-12 post-btn">Capture pictures of dogs</button>
+                            <label className="btn  btn-primary col-sm-12 post-btn">
+                                Upload pictures of wildlife
+                                <input
+                                    style={{"display": "none"}}
+                                    type="file"
+                                    accept="image/*"
+                                />
+                            </label>
+                            <label className="btn  btn-primary col-sm-12 post-btn">
+                                Capture pictures of dogs
+                                <input
+                                    style={{"display": "none"}}
+                                    type="file"
+                                    accept="image/*"
+                                />
+                            </label>
                         </div>
                     </div>
                 </div>
