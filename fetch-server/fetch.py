@@ -3,7 +3,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from flask_uploads import UploadSet, configure_uploads, IMAGES
-from models.image import Image, ImageAdmin
+from models.image import RouteImage, RouteImageAdmin
 from models.route import Route, RouteAdmin
 from models.user import User, Role, UserAdmin
 from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
@@ -30,10 +30,10 @@ admin.add_view(UserAdmin(User, db.session))
 admin.add_view(RouteAdmin(Route, db.session))
 admin.add_view(WildlifeTypeAdmin(WildlifeType, db.session))
 admin.add_view(WildlifeAdmin(Wildlife, db.session))
-admin.add_view(ImageAdmin(Image, db.session))
+admin.add_view(RouteImageAdmin(RouteImage, db.session))
 
-images = UploadSet('images', IMAGES)
-configure_uploads(app, images)
+route_images = UploadSet('route', IMAGES, default_dest=(lambda app: app.config['FS_ROUTE_IMAGES_ROOT']))
+configure_uploads(app, route_images)
 
 # displays the home page.
 @app.route('/')
@@ -43,13 +43,16 @@ configure_uploads(app, images)
 def index():
     return render_template('index.html')
 
+'''
+Returns the image with the given identifier
+'''
 @login_required
-@app.route('/api/image/<int:image_id>')
+@app.route('/api/image/route/<int:image_id>')
 def download_image(image_id):
-    image = Image.query.get(image_id)
+    image = RouteImage.query.get(image_id)
     if image is None:
         abort(404)
-    return send_from_directory(app.config['FS_IMAGES_ROOT'],
+    return send_from_directory(app.config['FS_ROUTE_IMAGES_ROOT'],
                                image.path,
                                as_attachment=False)
 
@@ -57,11 +60,20 @@ def failure_msg(msg):
     return jsonify({'result': 'failure',
                     'message': msg })
 
+'''
+A form with enctype="multipart/form-data" should be sent to this address. It
+should contain the following fields:
+
+<input type="file" name="image" />
+<input type="text" name="route_id" />
+
+The input "route_id" should contain the id of the route that image should be
+added to.
+
+'''
 @login_required
-@app.route('/api/upload_image', methods=['GET', 'POST'])
+@app.route('/api/upload_route_image', methods=['GET', 'POST'])
 def upload_image():
-    print request.args
-    print request.files
     if request.method == 'POST':
         route_id = request.form.get('route_id', default=-1, type=int)
 
@@ -73,8 +85,8 @@ def upload_image():
         if route is None:
             return failure_msg('Route "%d" does not exist' % (route_id))
 
-        path = images.save(request.files['image'])
-        image = Image(path=path)
+        path = route_images.save(request.files['image'])
+        image = RouteImage(path=path)
         route.images.append(image)
         db.session.add(image)
         db.session.add(route)

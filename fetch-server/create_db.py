@@ -63,8 +63,11 @@ if __name__ == '__main__':
 
     app = utils.get_app()
 
-    try:
-        os.makedirs(app.config['FS_IMAGES_ROOT'])
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    for d in ['FS_IMAGES_ROOT', 
+              'FS_ROUTE_IMAGES_ROOT',
+              'FS_WILDLIFE_IMAGES_ROOT']:
+        try:
+            os.makedirs(app.config[d])
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise

@@ -15,7 +15,7 @@ except ValueError:
 db  = utils.get_db()
 app = utils.get_app()
 
-class Image(db.Model):
+class RouteImage(db.Model):
     __tablename__ = 'image'
     id       = db.Column(db.Integer, primary_key=True)
     path     = db.Column(db.Unicode(255))
@@ -26,9 +26,9 @@ class Image(db.Model):
         return prefix.encode("utf-8").decode("utf-8") + self.path
 
     def get_fullpath(self):
-        return op.join(app.config['FS_IMAGES_ROOT'], self.path)
+        return op.join(app.config['FS_ROUTE_IMAGES_ROOT'], self.path)
 
-class ImageAdmin(ModelView):
+class RouteImageAdmin(ModelView):
     column_list = ('path', 'image')
 
     def _list_thumbnail(view, context, model, value):
@@ -44,15 +44,15 @@ class ImageAdmin(ModelView):
     # Alternative way to contribute field is to override it completely.
     # In this case, Flask-Admin won't attempt to merge various parameters for the field.
     form_extra_fields = {
-        'path': form.ImageUploadField('Image',
+        'path': form.ImageUploadField('RouteImage',
                                       allow_overwrite=False,
-                                      base_path=app.config['FS_IMAGES_ROOT'])
+                                      base_path=app.config['FS_ROUTE_IMAGES_ROOT'])
     }
 
     def is_accessible(self):
         return current_user.has_role('superuser')
 
-@listens_for(Image, 'after_delete')
+@listens_for(RouteImage, 'after_delete')
 def del_image(mapper, connection, target):
     # Delete image
     try:

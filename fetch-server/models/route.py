@@ -25,7 +25,7 @@ class Route(db.Model):
 
     path           = db.Column(Geometry("LINESTRING"))
 
-    images         = db.relationship('Image')
+    images         = db.relationship('RouteImage')
 
     def __str__(self):
         return self.name

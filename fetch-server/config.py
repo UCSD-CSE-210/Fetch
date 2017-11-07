@@ -1,4 +1,5 @@
 import os
+import os.path as op
 
 SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://fetch_db:fetch_db@localhost/fetch_db'
 
@@ -15,6 +16,9 @@ MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZmV0Y2gwMDEiLCJhIjoiY2o5Z2VwYTVxMnY0dTMzcndibG
 
 
 # FS_IMAGES_ROOT = '~/fetch_fs/images'
-FS_IMAGES_ROOT = os.path.join(os.getenv('HOME'), 'fetch_fs', 'images')
+# TODO: make this <relative>/images/route
+FS_IMAGES_ROOT          = op.join(op.dirname(op.abspath(op.realpath(__file__))), 'images')
+FS_ROUTE_IMAGES_ROOT    = op.join(FS_IMAGES_ROOT, 'route')
+FS_WILDLIFE_IMAGES_ROOT = op.join(FS_IMAGES_ROOT, 'wildlife')
 
 UPLOADED_IMAGES_DEST = FS_IMAGES_ROOT
