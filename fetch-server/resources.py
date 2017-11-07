@@ -1,5 +1,6 @@
 from models.route import Route, RouteAdmin
 from models.wildlife import WildlifeType, Wildlife
+from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
@@ -38,14 +39,12 @@ wildlife_parser.add_argument('wildlifetype', type=int, store_missing=False)
 wildlife_parser.add_argument('location', type=dict, store_missing=False)
 wildlife_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
 
-# JSON response
-# { 'results' : [ route1, route2, ...] }
-# where each route has the following fields:
-
 class Coordinates(fields.Raw):
     def format(self, wkb):
         coords = to_shape(wkb).coords[:]
-        return map(lambda (x,y): [x,y], coords)
+        return map(lambda (x,y): {'latitude'  : y,
+                                  'longitude' : x}, 
+                   coords)
 
 class WildlifeTypeField(fields.Raw):
     def format(self, wt):
@@ -62,6 +61,12 @@ class LocationField(fields.Raw):
             'longitude' : point[0][1]
         }
 
+class ImageField(fields.Raw):
+    def format(self, imgs):
+        return map(lambda img: {'image_id': img.id,
+                                'image_url': url_for('download_image', image_id=img.id)},
+                   imgs)
+
 route_fields = {
     'id'             : fields.Integer,
     'name'           : fields.String,
@@ -70,7 +75,8 @@ route_fields = {
     'is_water'       : fields.Boolean,
     'is_garbage_can' : fields.Boolean,
     'is_poop_bag'    : fields.Boolean,
-    'coodinates'     : Coordinates(attribute='path')
+    'coodinates'     : Coordinates(attribute='path'),
+    'images'         : ImageField(attribute='images')
 }
 
 wildlife_type_fields = {
@@ -87,6 +93,29 @@ wildlife_fields = {
 
 # filter & respond to the search query
 class RouteResource(Resource):
+    '''
+    Query parameters:
+      id             : Route id
+      name           : Route name
+      address        : Route address (substring, case-insensitive)
+      is_shade       : Has shade?
+      is_water       : Has water?
+      is_garbage_can : Has garbage can?
+      is_poop_bag    : Has poop bag?
+    
+    - All parameters are optional. 
+    - If an `id` is not given, search will be done on all routes with the rest
+      of the given parameters.
+    - Otherwise, the route with the given id (if exists) will be returned.
+    
+    JSON Response:
+    { 'results' : [route1, route2, ...] }
+    where each route object contains the following:
+    id, name, address, is_shade, is_water, is_garbage_can, is_poop_bag, coodinates, images
+    
+    Coordinates is a list of objects that contain latitude and longitude fields
+    Images is a list of objects that contain image_id and image_url fields.
+    '''
     @marshal_with(route_fields, envelope='results')
     def get(self):
         args = search_parser.parse_args(strict=True)

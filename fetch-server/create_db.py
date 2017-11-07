@@ -5,6 +5,7 @@ from models.route import Route
 from models.wildlife import WildlifeType
 from shapely.geometry import LineString
 from geoalchemy2.shape import from_shape
+import os, errno
 
 def build_sample_db(db):
     db.drop_all()
@@ -59,3 +60,14 @@ def build_sample_db(db):
 if __name__ == '__main__':
     db = utils.get_db()
     build_sample_db(db)
+
+    app = utils.get_app()
+
+    for d in ['FS_IMAGES_ROOT', 
+              'FS_ROUTE_IMAGES_ROOT',
+              'FS_WILDLIFE_IMAGES_ROOT']:
+        try:
+            os.makedirs(app.config[d])
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
