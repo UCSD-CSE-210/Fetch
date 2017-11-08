@@ -8,8 +8,14 @@
 }
 
 .Header-logo {
-  animation: Header-logo-spin infinite 1s linear;
   height: 80px;
+  display: inline-block;
+}
+
+#fetch{
+  display: inline-block;
+  margin: 10px;
+  vertical-align: middle;
 }
 
 .Header-title {
@@ -18,12 +24,6 @@
 
 .Header-intro {
   font-size: large;
-}
-
-@keyframes Header-logo-spin {
-    0%{transform: rotate(20deg);}
-    50%{transform: rotate(-10deg);}
-    100%{transform: rotate(20deg);}
 }
 
 .btn-header{

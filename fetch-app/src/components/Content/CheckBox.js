@@ -1,4 +1,6 @@
 import React from 'react';
+import "./CheckBox.css"
+
 
 class CheckBox extends React.Component {
 
@@ -18,7 +20,7 @@ class CheckBox extends React.Component {
         return (
             <div>
                 <label>
-                    <input
+                    <input className="checkbox"
                         type="checkbox"
                         value={label}
                         onClick={this.toggleCheckBoxChange}
