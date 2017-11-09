@@ -3,7 +3,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from flask_uploads import UploadSet, configure_uploads, IMAGES
-from models.image import RouteImage, RouteImageAdmin
+from models.image import RouteImage, RouteImageAdmin, WildlifeImage, WildlifeImageAdmin
 from models.route import Route, RouteAdmin
 from models.user import User, Role, UserAdmin
 from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
@@ -31,9 +31,12 @@ admin.add_view(RouteAdmin(Route, db.session))
 admin.add_view(WildlifeTypeAdmin(WildlifeType, db.session))
 admin.add_view(WildlifeAdmin(Wildlife, db.session))
 admin.add_view(RouteImageAdmin(RouteImage, db.session))
+admin.add_view(WildlifeImageAdmin(WildlifeImage, db.session))
 
 route_images = UploadSet('route', IMAGES, default_dest=(lambda app: app.config['FS_ROUTE_IMAGES_ROOT']))
+wildlife_images = UploadSet('wildlife', IMAGES, default_dest=(lambda app: app.config['FS_WILDLIFE_IMAGES_ROOT']))
 configure_uploads(app, route_images)
+configure_uploads(app, wildlife_images)
 
 # displays the home page.
 @app.route('/')
@@ -55,6 +58,16 @@ def download_image(image_id):
     return send_from_directory(app.config['FS_ROUTE_IMAGES_ROOT'],
                                image.path,
                                as_attachment=False)
+
+@login_required
+@app.route('/api/image/wildlife/<int:image_id>')
+def download_wildlife_image(image_id):
+    image = WildlifeImage.query.get(image_id)
+    if image is None:
+        abort(404)
+    return send_from_directory(app.config['FS_WILDLIFE_IMAGES_ROOT'],
+                            image.path,
+                            as_attachment=False)
 
 def failure_msg(msg):
     return jsonify({'result': 'failure',
@@ -99,3 +112,30 @@ def upload_image():
     else:
         return render_template('upload.html')
 
+@app.route('/api/upload_wildlife_image', methods=['GET', 'POST'])
+def upload_wildlife_image():
+    if request.method == 'POST':
+        wildlife_id = request.form.get('wildlife_id', default=-1, type=int)
+        if wildlife_id < 0:
+            return failure_msg('Missing wildlife id')
+        if 'wildlife_image' not in request.files:
+            return failure_msg('Missing image')
+        
+        wildlife = Wildlife.query.get(wildlife_id)
+
+        if wildlife is None:
+            return failure_msg('Wildlife "%d" does not exist' % (wildlife_id))
+        
+        path = wildlife_images.save(request.files['wildlife_image'])
+        image = WildlifeImage(path=path)
+        wildlife.images.append(image)
+        db.session.add(image)
+        db.session.add(wildlife)
+        db.session.commit()
+
+        return jsonify({'result': 'success',
+                        'image': {'id': '1',
+                                  'url': url_for('download_wildlife_image',
+                                                 image_id='1')}})
+    else:
+        return render_template('upload_wildlife.html')

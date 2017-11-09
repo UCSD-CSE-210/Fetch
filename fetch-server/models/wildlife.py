@@ -33,6 +33,7 @@ class Wildlife(db.Model):
     wildlifetype_id = db.Column(db.Integer, db.ForeignKey('wildlifetype.id'))
     wildlifetype    = db.relationship("WildlifeType")
     location        = db.Column(Geometry("POINT"))
+    images         = db.relationship('WildlifeImage')
 
 class WildlifeAdmin(ModelView):
     column_auto_select_related = True
