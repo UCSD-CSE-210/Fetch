@@ -38,6 +38,7 @@ wildlife_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 wildlife_parser.add_argument('wildlifetype', type=int, store_missing=False)
 wildlife_parser.add_argument('location', type=dict, store_missing=False)
 wildlife_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
+wildlife_parser.add_argument('route', type=int, store_missing=False)
 
 class Coordinates(fields.Raw):
     def format(self, wkb):
@@ -170,14 +171,17 @@ class WildlifeResource(Resource):
     Query parameters:
     1. is_dangerous - optional boolean
     2. name - optional string
+    3. route - int
     '''
     @marshal_with(wildlife_fields, envelope='results')
     def get(self):
         args = wildlife_parser.parse_args(strict=True)
+        q = Wildlife.query
+        if 'route' in args:
+            q = q.filter(Wildlife.route_id == args['route'])
         if 'is_dangerous' in args:
-            return Wildlife.query.filter(Wildlife.wildlifetype.has(is_dangerous=args['is_dangerous'])).all()
-        else:
-            return Wildlife.query.all()
+            q = q.filter(Wildlife.wildlifetype.has(is_dangerous=args['is_dangerous']))
+        return q.all()
 
     '''
     JSON payload

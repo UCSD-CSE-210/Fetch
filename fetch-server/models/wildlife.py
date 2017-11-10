@@ -3,6 +3,7 @@ from flask import Flask
 from flask_security import current_user
 from flask_admin.contrib.geoa import ModelView
 from geoalchemy2.types import Geometry
+import route
 
 try:
     from .. import utils
@@ -33,7 +34,9 @@ class Wildlife(db.Model):
     wildlifetype_id = db.Column(db.Integer, db.ForeignKey('wildlifetype.id'))
     wildlifetype    = db.relationship("WildlifeType")
     location        = db.Column(Geometry("POINT"))
-    images         = db.relationship('WildlifeImage')
+    images          = db.relationship('WildlifeImage')
+    route_id        = db.Column(db.Integer, db.ForeignKey('route.id'))
+    route           = db.relationship('Route')
 
 class WildlifeAdmin(ModelView):
     column_auto_select_related = True
