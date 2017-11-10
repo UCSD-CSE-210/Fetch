@@ -1,6 +1,6 @@
 import React from 'react';
-import "./PostsRender.css"
-import Post from './Post'
+import "./PostsRender.css";
+import Post from './Post';
 
 class PostsRender extends React.Component {
 

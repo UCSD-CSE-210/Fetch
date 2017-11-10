@@ -26,17 +26,20 @@ class SearchBar extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
         let params = {
-            'text': this.state.text,
-            'is_shaded': this.selectedCheckBoxes.has('is shaded'),
-            'garbage': this.selectedCheckBoxes.has('has garbage bag'),
-            'wildlife': this.selectedCheckBoxes.has('show wildlife'),
-        };
+            'address': this.state.text,
+        }
+        if (this.selectedCheckBoxes.has('is shaded')) {
+            params['is_shade'] = true; 
+        }
+        if (this.selectedCheckBoxes.has('has garbage bag')) {
+            params['is_garbage_can'] = true;
+        }
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
 
-        fetch('http://192.168.1.65:4000/search?' + query)
+        fetch('http://localhost:5000/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data)});
     }

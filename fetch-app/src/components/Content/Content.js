@@ -14,8 +14,11 @@ class Content extends React.Component {
     }
 
     fillServerResult(data) {
+      data = data.results;
+      if (data != null && data.length > 0) {
         this.setState({postsRender: null});
         this.setState({postsRender : <PostsRender items = {data}/>});
+      }
     }
 
     render() {
