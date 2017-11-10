@@ -13,11 +13,14 @@ class Content extends React.Component {
       this.fillServerResult = this.fillServerResult.bind(this);
     }
 
-    fillServerResult(data) {
-      data = data.results;
+    fillServerResult(data, shouldShow) {
       if (data != null && data.length > 0) {
         this.setState({postsRender: null});
-        this.setState({postsRender : <PostsRender items = {data}/>});
+        this.setState({postsRender : <PostsRender items = {data} 
+                                                  shouldShow = {shouldShow}/>});
+      }
+      else {
+        this.setState({postsRender: <p>Oops... Cannot find; Will have more route in the future</p>});
       }
     }
 

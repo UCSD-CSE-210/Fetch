@@ -47,7 +47,7 @@ class PostsRender extends React.Component {
         this.state.items.forEach((item, index) => {
             lis.push(
                 <div className="col-xs-12 col-lg-6 col-xl-4" key={index.toString()}>
-                    <Post value={item}/>
+                    <Post value={item} shouldShow={this.props.shouldShow}/>
                 </div>
             );
         });

@@ -38,10 +38,12 @@ class SearchBar extends React.Component {
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-
+        var shouldShow = {
+            wildlife : this.selectedCheckBoxes.has('show wildlife'),
+        }
         fetch('http://localhost:5000/api/route?' + query)
                 .then(data => data.json())
-                .then(data => {this.props.callback(data)});
+                .then(data => {this.props.callback(data.results, shouldShow)});
     }
 
     toggleCheckBox(label) {

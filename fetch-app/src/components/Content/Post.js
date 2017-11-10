@@ -9,17 +9,13 @@ class Post extends React.Component {
         this.state = {
             imgs : "http://placehold.it/400x20undefined1",
             mapURL : "http://placehold.it/400x20undefined1",
+            wildlifeInfo : "",
         }
-        this.ourToken = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
-        this.token="pk.eyJ1IjoicGV0cnVzanZyIiwiYSI6IkJuWjZqbTgifQ._rWDJ27Qq-wCl-l8flkbVQ";
+        this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
     }
 
-    componentDidMount() {
-        fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
-            .then(data => data.json())
-            .then(data => {
-                this.setState({imgs: data.message})
-            });
+    _renderMap() {
+        //auto zoom level
         var info = this.props.value;
         let path = [];
         info.coodinates.forEach((items, index) => {
@@ -46,18 +42,41 @@ class Post extends React.Component {
         var center = geoViewport.viewport([
                 minX, minY, maxX, maxY
             ], [500, 300]);
-        console.log(minX);console.log(maxX);console.log(minY);console.log(maxY);
         var viewpoint = `${center.center[0]},${center.center[1]},${center.zoom - 1.5}`;
-        //console.log(path);
+
+        //wildlife
+        if (this.props.shouldShow.wildlife) {
+            /*need backend support; model relation between route and wildlife*/
+            // fetch(`http://localhost:5000/api/wildlifetype?id=${info.id}`)
+            //     .then(data => data.json())
+            //     .then(data => {
+            //         console.log(data.results);
+            //         if (data.results) {
+            //             this.setState({wildlifeInfo: data.results.name + '</br>'})
+            //         }
+            //     });           
+        }
         this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
-                'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
-                `${viewpoint}/500x300?` +
-                `access_token=${this.token}`});
+            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
+            `${viewpoint}/500x300?` +
+            `access_token=${this.token}`});
+    }
+
+    componentDidMount() {
+        fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
+            .then(data => data.json())
+            .then(data => {
+                this.setState({imgs: data.message})
+            });
+        this._renderMap();
+    }
+
+    _yesOrNo(boolValue) {
+        return (boolValue)? 'Yes' : 'No';
     }
 
     render() {
         var info = this.props.value;
-
                 //future work
                 // <h5>
                 //     <span className="opacity">{info.date}</span>
@@ -69,12 +88,16 @@ class Post extends React.Component {
         return (
             <div className="post-card container">
                 <h3><b>{info.name}</b></h3>
-
-
                 <div className="row">
                     <div className="col-sm-4">
                         <div>
-                            <p>{info.address}</p>
+                            <p>
+                                address: {info.address}<br/>
+                                shade: {this._yesOrNo(info.is_shade)}<br/>
+                                garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
+                                water: {this._yesOrNo(info.is_water)}<br/>
+                                {this.wildlifeInfo}
+                            </p>
                         </div>
                         <div className="post-img">
                             <img className="map img-responsive" src={this.state.imgs} alt="dog img on trail"/>
