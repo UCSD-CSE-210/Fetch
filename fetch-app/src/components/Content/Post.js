@@ -92,10 +92,10 @@ class Post extends React.Component {
                     <div className="col-sm-4">
                         <div>
                             <p>
-                                address: {info.address}<br/>
-                                shade: {this._yesOrNo(info.is_shade)}<br/>
-                                garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
-                                water: {this._yesOrNo(info.is_water)}<br/>
+                                Address: {info.address}<br/>
+                                Shade: {this._yesOrNo(info.is_shade)}<br/>
+                                Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
+                                Water: {this._yesOrNo(info.is_water)}<br/>
                                 {this.wildlifeInfo}
                             </p>
                         </div>

@@ -3,9 +3,8 @@ import "./SearchBar.css";
 import CheckBox from './CheckBox.js';
 
 const items = [
-    'is shaded',
-    'has garbage bag',
-    'show wildlife',
+    'Is shaded?',
+    'Has garbage can?'
 ]
 
 class SearchBar extends React.Component {
@@ -28,10 +27,10 @@ class SearchBar extends React.Component {
         let params = {
             'address': this.state.text,
         }
-        if (this.selectedCheckBoxes.has('is shaded')) {
+        if (this.selectedCheckBoxes.has('Is shaded?')) {
             params['is_shade'] = true; 
         }
-        if (this.selectedCheckBoxes.has('has garbage bag')) {
+        if (this.selectedCheckBoxes.has('Has garbage can?')) {
             params['is_garbage_can'] = true;
         }
         let esc = encodeURIComponent
@@ -41,7 +40,7 @@ class SearchBar extends React.Component {
         var shouldShow = {
             wildlife : this.selectedCheckBoxes.has('show wildlife'),
         }
-        fetch('http://localhost:5000/api/route?' + query)
+        fetch('http://127.0.0.1:5000/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
     }
