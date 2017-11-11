@@ -20,7 +20,7 @@ class Content extends React.Component {
                                                   shouldShow = {shouldShow}/>});
       }
       else {
-        this.setState({postsRender: <p>Oops... Cannot find; Will have more route in the future</p>});
+        this.setState({postsRender: <p>There are no routes that match the given criteria</p>});
       }
     }
 
