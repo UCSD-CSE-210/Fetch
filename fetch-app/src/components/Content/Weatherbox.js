@@ -31,4 +31,4 @@ class Weatherbox extends React.Component {
 
 }
 
-export default CheckBox;
+export default Weatherbox;
