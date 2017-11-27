@@ -22,14 +22,15 @@ def surface_type_checker(value):
 
 # GET parameters for the search
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
-search_parser.add_argument('id',             type=int,                  store_missing=False)
-search_parser.add_argument('name',           type=str,                  store_missing=False)
-search_parser.add_argument('address',        type=str,                  store_missing=False)
-search_parser.add_argument('is_shade',       type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('is_water',       type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('is_garbage_can', type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('is_poop_bag',    type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('surface',        type=surface_type_checker, store_missing=False)
+search_parser.add_argument('id',              type=int,                  store_missing=False)
+search_parser.add_argument('name',            type=str,                  store_missing=False)
+search_parser.add_argument('address',         type=str,                  store_missing=False)
+search_parser.add_argument('is_shade',        type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('is_water',        type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('is_garbage_can',  type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('has_parking_lot', type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('is_poop_bag',     type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('surface',         type=surface_type_checker, store_missing=False)
 
 # GET parameters for wildlife
 wildlife_type_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -77,16 +78,17 @@ class ImageField(fields.Raw):
                    imgs)
 
 route_fields = {
-    'id'             : fields.Integer,
-    'name'           : fields.String,
-    'address'        : fields.String,
-    'is_shade'       : fields.Boolean,
-    'is_water'       : fields.Boolean,
-    'is_garbage_can' : fields.Boolean,
-    'is_poop_bag'    : fields.Boolean,
-    'coodinates'     : Coordinates(attribute='path'),
-    'images'         : ImageField(attribute='images'),
-    'surface'        : fields.String
+    'id'              : fields.Integer,
+    'name'            : fields.String,
+    'address'         : fields.String,
+    'is_shade'        : fields.Boolean,
+    'is_water'        : fields.Boolean,
+    'is_garbage_can'  : fields.Boolean,
+    'is_poop_bag'     : fields.Boolean,
+    'has_parking_lot' : fields.Boolean,
+    'coodinates'      : Coordinates(attribute='path'),
+    'images'          : ImageField(attribute='images'),
+    'surface'         : fields.String
 }
 
 wildlife_type_fields = {

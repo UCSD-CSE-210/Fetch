@@ -20,10 +20,11 @@ class Route(db.Model):
     name           = db.Column(db.String(255))
     address        = db.Column(db.String(255))
 
-    is_shade       = db.Column(db.Boolean())
-    is_water       = db.Column(db.Boolean())
-    is_garbage_can = db.Column(db.Boolean())
-    is_poop_bag    = db.Column(db.Boolean())
+    is_shade        = db.Column(db.Boolean())
+    is_water        = db.Column(db.Boolean())
+    is_garbage_can  = db.Column(db.Boolean())
+    is_poop_bag     = db.Column(db.Boolean())
+    has_parking_lot = db.Column(db.Boolean())
 
     path           = db.Column(Geometry("LINESTRING"))
 
