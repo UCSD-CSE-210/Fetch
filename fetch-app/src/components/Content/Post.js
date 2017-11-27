@@ -2,9 +2,12 @@ import React from 'react';
 import "./Post.css";
 import geoViewport from '@mapbox/geo-viewport'
 import WildLifeUploader from './WildLifeUploader'
+import Lightbox from 'react-image-lightbox';
+
 
 class Post extends React.Component {
 
+    var images = [];
     constructor(props) {
         super(props);
         this.state = {
@@ -12,6 +15,8 @@ class Post extends React.Component {
             mapURL : "http://placehold.it/400x20undefined1",
             wildlifeInfo : "",
             modal : null,
+            photoIndex: 0,
+            isOpen: false
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
@@ -77,6 +82,7 @@ class Post extends React.Component {
         fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
             .then(data => data.json())
             .then(data => {
+                images.append(data.message);
                 this.setState({imgs: data.message})
             });
         this._renderMap();
@@ -101,6 +107,10 @@ class Post extends React.Component {
     }
 
     render() {
+        const {
+            photoIndex,
+            isOpen,
+        } = this.state;
         var info = this.props.value;
                 //future work
                 // <h5>
@@ -124,9 +134,25 @@ class Post extends React.Component {
                                 {this.state.wildlifeInfo}
                             </p>
                         </div>
-                        <div className="post-img">
-                            <img className="map img-responsive" src={this.state.imgs} alt="dog img on trail"/>
-                        </div>
+                        {isOpen &&
+                            <Lightbox className="post-img"
+                                mainSrc={images[photoIndex]}
+                                nextSrc={images[(photoIndex + 1) % images.length]}
+                                prevSrc={images[(photoIndex + images.length - 1) % images.length]}
+         
+                                onCloseRequest={() => this.setState({ isOpen: false })}
+                                onMovePrevRequest={() => this.setState({
+                                    photoIndex: (photoIndex + images.length - 1) % images.length,
+                                })}
+                                onMoveNextRequest={() => this.setState({
+                                    photoIndex: (photoIndex + 1) % images.length,
+                                })}
+                            />
+                        }
+                    
+                        // <div className="post-img">
+                        //     <img className="map img-responsive" src={this.state.imgs} alt="dog img on trail"/>
+                        // </div>
                     </div>
 
                     <div className="col-sm-8">
