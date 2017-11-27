@@ -111,9 +111,9 @@ class Post extends React.Component {
         const {
             photoIndex,
             isOpen,
+            images,
         } = this.state;
         var info = this.props.value;
-        var images = this.state.images;
         return (
             <div className="post-card container">
                 <h3><b>{info.name}</b></h3>
@@ -127,6 +127,14 @@ class Post extends React.Component {
                                 Water: {this._yesOrNo(info.is_water)}<br/>
                                 {this.state.wildlifeInfo}
                             </p>
+                        </div>
+                        <div className="post-img">
+                            <img
+                                src={images[0]}
+                                className="map img-responsive"
+                                alt="dog img on trail"
+                                onClick={() => this.setState({isOpen: true})}
+                            />
                         </div>
                         {isOpen &&
                             <Lightbox className="post-img"
