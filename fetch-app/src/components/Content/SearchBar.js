@@ -32,7 +32,7 @@ class SearchBar extends React.Component {
         event.preventDefault();
         let params = {
             'address': this.state.text,
-            'radius' : this.state.radius,
+            //'radius' : this.state.radius,
         }
         if (this.selectedCheckBoxes.has('Is shaded?')) {
             params['is_shade'] = true; 

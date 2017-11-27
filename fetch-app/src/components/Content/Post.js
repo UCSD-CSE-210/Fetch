@@ -7,7 +7,6 @@ import Lightbox from 'react-image-lightbox';
 
 class Post extends React.Component {
 
-    var images = [];
     constructor(props) {
         super(props);
         this.state = {
@@ -16,7 +15,8 @@ class Post extends React.Component {
             wildlifeInfo : "",
             modal : null,
             photoIndex: 0,
-            isOpen: false
+            isOpen: false,
+            images: [],
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
@@ -82,8 +82,9 @@ class Post extends React.Component {
         fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
             .then(data => data.json())
             .then(data => {
-                images.append(data.message);
-                this.setState({imgs: data.message})
+                this.setState({imgs: data.message,
+                               images: this.state.images.concat([data.message])});
+                console.log(this.state.images);
             });
         this._renderMap();
     }
@@ -112,14 +113,7 @@ class Post extends React.Component {
             isOpen,
         } = this.state;
         var info = this.props.value;
-                //future work
-                // <h5>
-                //     <span className="opacity">{info.date}</span>
-                //         <span className="ratings">
-                //             <b>Ratings  </b>
-                //         <span className="tag">{info.ratings}</span>
-                //     </span>
-                // </h5>
+        var images = this.state.images;
         return (
             <div className="post-card container">
                 <h3><b>{info.name}</b></h3>
@@ -149,10 +143,6 @@ class Post extends React.Component {
                                 })}
                             />
                         }
-                    
-                        // <div className="post-img">
-                        //     <img className="map img-responsive" src={this.state.imgs} alt="dog img on trail"/>
-                        // </div>
                     </div>
 
                     <div className="col-sm-8">
