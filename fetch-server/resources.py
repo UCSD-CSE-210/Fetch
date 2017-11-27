@@ -1,4 +1,5 @@
 from models.route import Route, RouteAdmin
+from models.surface import Surface
 from models.wildlife import WildlifeType, Wildlife
 from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
@@ -10,18 +11,25 @@ import copy
 
 import utils
 
+
 api = utils.get_api()
 db = utils.get_db()
 
+def surface_type_checker(value):
+    if value not in Surface.types:
+        raise ValueError("Surface type is not valid")
+    return value
+
 # GET parameters for the search
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
-search_parser.add_argument('id'             , type=int,  store_missing=False)
-search_parser.add_argument('name'           , type=str,  store_missing=False)
-search_parser.add_argument('address'        , type=str,  store_missing=False)
-search_parser.add_argument('is_shade'       , type=inputs.boolean, store_missing=False)
-search_parser.add_argument('is_water'       , type=inputs.boolean, store_missing=False)
-search_parser.add_argument('is_garbage_can' , type=inputs.boolean, store_missing=False)
-search_parser.add_argument('is_poop_bag'    , type=inputs.boolean, store_missing=False)
+search_parser.add_argument('id',             type=int,                  store_missing=False)
+search_parser.add_argument('name',           type=str,                  store_missing=False)
+search_parser.add_argument('address',        type=str,                  store_missing=False)
+search_parser.add_argument('is_shade',       type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('is_water',       type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('is_garbage_can', type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('is_poop_bag',    type=inputs.boolean,       store_missing=False)
+search_parser.add_argument('surface',        type=surface_type_checker, store_missing=False)
 
 # GET parameters for wildlife
 wildlife_type_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -77,7 +85,8 @@ route_fields = {
     'is_garbage_can' : fields.Boolean,
     'is_poop_bag'    : fields.Boolean,
     'coodinates'     : Coordinates(attribute='path'),
-    'images'         : ImageField(attribute='images')
+    'images'         : ImageField(attribute='images'),
+    'surface'        : fields.String
 }
 
 wildlife_type_fields = {
@@ -123,21 +132,28 @@ class RouteResource(Resource):
         print "args:", args
         if 'id' not in args:
             q = Route.query
+
             if 'name' in args:
                 name = args['name']
                 args.pop('name')
                 q = q.filter(Route.name.ilike('%'+name+'%'))
+
             if 'address' in args:
                 address = args['address']
                 args.pop('address')
                 q = q.filter(Route.address.ilike('%'+address+'%'))
+
+            if 'surface' in args:
+                surface = args['surface']
+                args.pop('surface')
+                q = q.filter(Route.surface.has(name=surface))
+
             results = q.filter_by(**args).all()
             return results
         else:
             route = Route.query.get(args['id'])
             return [route] if route is not None else []
-
-
+    
 class WildlifeTypeResource(Resource):
     '''
     Query parameters:

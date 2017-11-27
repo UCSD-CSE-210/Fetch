@@ -4,6 +4,8 @@ from flask_admin.contrib.geoa import ModelView
 from flask_security import current_user
 from geoalchemy2.types import Geometry
 
+import surface
+
 try:
     from .. import utils
 except ValueError:
@@ -26,6 +28,9 @@ class Route(db.Model):
     path           = db.Column(Geometry("LINESTRING"))
 
     images         = db.relationship('RouteImage')
+
+    surface_id     = db.Column(db.Integer, db.ForeignKey('surface.id'), nullable=False)
+    surface        = db.relationship('Surface')
 
     def __str__(self):
         return self.name
