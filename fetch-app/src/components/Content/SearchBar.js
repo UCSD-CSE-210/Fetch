@@ -4,7 +4,8 @@ import CheckBox from './CheckBox.js';
 
 const items = [
     'Is shaded?',
-    'Has garbage can?'
+    'Has garbage can?',
+    'Show wildlife?',
 ]
 
 class SearchBar extends React.Component {
@@ -38,7 +39,7 @@ class SearchBar extends React.Component {
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
         var shouldShow = {
-            wildlife : this.selectedCheckBoxes.has('show wildlife'),
+            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
         }
         fetch('http://127.0.0.1:5000/api/route?' + query)
                 .then(data => data.json())
