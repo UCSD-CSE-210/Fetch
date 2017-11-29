@@ -18,7 +18,6 @@ Flask-SQLAlchemy==2.3.2
 Flask-Uploads==0.2.1
 Flask-WTF==0.14.2
 GeoAlchemy2==0.4.0
-geopy==1.11.0
 image==1.5.16
 itsdangerous==0.24
 Jinja2==2.9.6

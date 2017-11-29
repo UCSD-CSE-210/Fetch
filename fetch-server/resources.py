@@ -5,8 +5,6 @@ from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
-from shapely.wkb import loads
-from geopy import distance
 
 import json
 import copy
@@ -16,10 +14,6 @@ import utils
 
 api = utils.get_api()
 db = utils.get_db()
-
-# a number of other elipsoids are supported
-distance.VincentyDistance.ELLIPSOID = 'WGS-84'
-distance_calculator = distance.distance
 
 def surface_type_checker(value):
     if value not in Surface.types:
@@ -83,17 +77,6 @@ class ImageField(fields.Raw):
                                 'image_url': url_for('download_image', image_id=img.id)},
                    imgs)
 
-class RouteDistance(fields.Raw):
-    def format(self, wkb):
-        cs   = to_shape(wkb).coords
-        sum_dist = 0.0
-        for n in range(len(cs) - 1):
-            # convert the coordinates to xy array elements, compute the distance
-            dist = distance_calculator(cs[n], cs[n+1])
-            sum_dist += dist.miles
-
-        return sum_dist
-
 route_fields = {
     'id'              : fields.Integer,
     'name'            : fields.String,
@@ -106,7 +89,7 @@ route_fields = {
     'coodinates'      : Coordinates(attribute='path'),
     'images'          : ImageField(attribute='images'),
     'surface'         : fields.String,
-    'distance'        : RouteDistance(attribute='path')
+    'distance'        : fields.Float
 }
 
 wildlife_type_fields = {

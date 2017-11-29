@@ -19,3 +19,5 @@ def get_app():
 def get_api():
     return api
 
+def get_default_srid():
+    return 4326
