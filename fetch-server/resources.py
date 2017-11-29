@@ -62,10 +62,21 @@ class WildlifeTypeField(fields.Raw):
 class LocationField(fields.Raw):
     def format(self, loc):
         point = to_shape(loc).coords[:]
-        print point
         return {
             'latitude'  : point[0][0],
             'longitude' : point[0][1]
+        }
+
+class RouteField(fields.Raw):
+    def format(self, route):
+        return {
+            'id': route.id,
+            'name': route.name,
+            'address': route.address,
+            'is_shade': route.is_shade,
+            'is_water': route.is_water,
+            'is_garbage_can': route.is_garbage_can,
+            'is_poop_bag': route.is_poop_bag,
         }
 
 class ImageField(fields.Raw):
@@ -82,7 +93,7 @@ route_fields = {
     'is_water'       : fields.Boolean,
     'is_garbage_can' : fields.Boolean,
     'is_poop_bag'    : fields.Boolean,
-    'coodinates'     : Coordinates(attribute='path'),
+    'coordinates'     : Coordinates(attribute='path'),
     'images'         : ImageField(attribute='images')
 }
 
@@ -95,7 +106,8 @@ wildlife_type_fields = {
 wildlife_fields = {
     'id' : fields.Integer,
     'wildlifetype' : WildlifeTypeField,
-    'location': LocationField
+    'location': LocationField,
+    'route': RouteField
 }
 
 # filter & respond to the search query
@@ -185,7 +197,8 @@ class WildlifeResource(Resource):
         "location": {
             "latitude": 100.0,
             "longitude": 123.23
-        }
+        },
+        "route": 2
     }
     '''
     @marshal_with(wildlife_fields, envelope='results')
@@ -194,7 +207,8 @@ class WildlifeResource(Resource):
         lat = args['location']['latitude']
         lon = args['location']['longitude']
         wildlifetype = args['wildlifetype']
-        return wildlife_manager.insert(lat, lon, wildlifetype)
+        route = args['route']
+        return wildlife_manager.insert(lat, lon, wildlifetype, route)
 
 
 # Add the resources to the app

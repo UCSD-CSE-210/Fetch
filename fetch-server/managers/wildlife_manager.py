@@ -1,7 +1,9 @@
 try:
   from ..models.wildlife import Wildlife, WildlifeType
+  from ..models.route import Route
 except ValueError:
   from models.wildlife import Wildlife, WildlifeType
+  from models.route import Route
 
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
@@ -32,10 +34,12 @@ class WildlifeManager():
       q = q.filter(Wildlife.wildlifetype.has(is_dangerous=is_dangerous))
     return q.all()
 
-  def insert(self, lat, lon, wildlifetype):
+  def insert(self, lat, lon, wildlifetype, routeid):
     point = [lat, lon]
     location = from_shape(Point(point))
-    wildlife = Wildlife(wildlifetype_id = wildlifetype, location = location)
+    wildlife = Wildlife(wildlifetype_id = wildlifetype,
+                        location = location,
+                        route_id = routeid)
     self.db.session.add(wildlife)
     self.db.session.commit()
     return wildlife
