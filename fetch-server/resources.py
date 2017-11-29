@@ -31,6 +31,10 @@ search_parser.add_argument('is_garbage_can',  type=inputs.boolean,       store_m
 search_parser.add_argument('has_parking_lot', type=inputs.boolean,       store_missing=False)
 search_parser.add_argument('is_poop_bag',     type=inputs.boolean,       store_missing=False)
 search_parser.add_argument('surface',         type=surface_type_checker, store_missing=False)
+search_parser.add_argument('min_distance',    type=float,                store_missing=False) # in miles
+search_parser.add_argument('max_distance',    type=float,                store_missing=False) # in miles
+# search_parser.add_argument('latitude',        type=float,                store_missing=False)
+# search_parser.add_argument('longitude',       type=float,                store_missing=False)
 
 # GET parameters for wildlife
 wildlife_type_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -129,34 +133,53 @@ class RouteResource(Resource):
     Coordinates is a list of objects that contain latitude and longitude fields
     Images is a list of objects that contain image_id and image_url fields.
     '''
+    
+    def update_filter(self, q, args, arg_name, call):
+        if arg_name in args:
+            arg = args[arg_name]
+            args.pop(arg_name)
+            return call(q, arg)
+        else:
+            return q
+    
+    def filter_name(self, q, name):
+        return q.filter(Route.name.ilike('%'+name+'%'))
+    
+    def filter_address(self, q, address):
+        return q.filter(Route.address.ilike('%'+address+'%'))
+    
+    def filter_surface(self, q, surface):
+        return q.filter(Route.surface.has(name=surface))
+    
+    def filter_min_distance(self, q, min_distance):
+        return q.filter(Route.distance >= min_distance)
+
+    def filter_max_distance(self, q, max_distance):
+        return q.filter(Route.distance <= max_distance)
+
     @marshal_with(route_fields, envelope='results')
     def get(self):
         args = search_parser.parse_args(strict=True)
         print "args:", args
-        if 'id' not in args:
-            q = Route.query
 
-            if 'name' in args:
-                name = args['name']
-                args.pop('name')
-                q = q.filter(Route.name.ilike('%'+name+'%'))
-
-            if 'address' in args:
-                address = args['address']
-                args.pop('address')
-                q = q.filter(Route.address.ilike('%'+address+'%'))
-
-            if 'surface' in args:
-                surface = args['surface']
-                args.pop('surface')
-                q = q.filter(Route.surface.has(name=surface))
-
-            results = q.filter_by(**args).all()
-            return results
-        else:
+        if 'id' in args:
             route = Route.query.get(args['id'])
             return [route] if route is not None else []
-    
+
+        q = Route.query
+        
+        filters = [('name',         self.filter_name),
+                   ('address',      self.filter_address),
+                   ('surface',      self.filter_surface),
+                   ('min_distance', self.filter_min_distance),
+                   ('max_distance', self.filter_max_distance)]
+        
+        for (arg,call) in filters:
+            q = self.update_filter(q, args, arg, call)
+        
+        results = q.filter_by(**args).all()
+        return results
+        
 class WildlifeTypeResource(Resource):
     '''
     Query parameters:
