@@ -4,14 +4,16 @@ import CheckBox from './CheckBox.js';
 
 const items = [
     'Is shaded?',
-    'Has garbage can?'
+    'Has garbage can?',
+    'Show wildlife?',
 ]
 
 class SearchBar extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {text : ''};
+        this.state = {text : '', radius: ''};
+        this.updatedRadius = this.updatedRadius.bind(this);
         this.updateText = this.updateText.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.selectedCheckBoxes = new Set();
@@ -22,10 +24,15 @@ class SearchBar extends React.Component {
         this.setState({text: event.target.value});
     }
 
+    updatedRadius(event){
+        this.setState({radius: event.target.value});
+    }
+
     handleSubmit(event) {
         event.preventDefault();
         let params = {
             'address': this.state.text,
+            //'radius' : this.state.radius,
         }
         if (this.selectedCheckBoxes.has('Is shaded?')) {
             params['is_shade'] = true; 
@@ -38,7 +45,7 @@ class SearchBar extends React.Component {
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
         var shouldShow = {
-            wildlife : this.selectedCheckBoxes.has('show wildlife'),
+            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
         }
         fetch('http://127.0.0.1:5000/api/route?' + query)
                 .then(data => data.json())
@@ -67,6 +74,7 @@ class SearchBar extends React.Component {
                 <div className='fulldiv'>
                     <form onSubmit={this.handleSubmit}>
                         <input
+                            className="address-input"
                             type = "text"
                             placeholder = " city or zip code ..."
                             value = {this.state.text}
@@ -80,7 +88,15 @@ class SearchBar extends React.Component {
                 <div className='checkbox'>
                     {checkboxes}
                 </div>
-      </div>
+                <div className='radiusbox'>
+                    <label>Search radius</label>
+                    <input type="text" className="radius-input"
+                            placeholder = "Search radius (miles)"
+                            value = {this.state.radius}
+                            onChange = {this.updatedRadius}
+                        />
+                </div>
+            </div>
     );
   }
 }

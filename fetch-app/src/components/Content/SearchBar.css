@@ -10,7 +10,7 @@ form {
   width: 85%;
 }
 
-input[type="text"] {
+.address-input {
   border: none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 0px;
@@ -40,4 +40,16 @@ button[type="search"]:hover {
     padding-top: 5px;
     color: #FFFFFF;
     justify-content: center;
+}
+
+.radiusbox{
+    color: #FFFFFF;
+}
+
+.radius-input{
+    border: none;
+    margin-left: 5px;
+    border-radius: 5px;
+    color: #000000;
+    font-size: 8pt;
 }
