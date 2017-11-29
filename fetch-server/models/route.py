@@ -4,9 +4,7 @@ from flask_admin.contrib.geoa import ModelView
 from flask_security import current_user
 from sqlalchemy.event import listens_for
 from geoalchemy2.types import Geography
-from geoalchemy2.shape import to_shape
-from geoalchemy2.elements import WKTElement
-from sqlalchemy import func
+from sqlalchemy.sql import text
 
 import surface
 
@@ -43,10 +41,9 @@ class Route(db.Model):
         return self.name
 
 @listens_for(Route, 'after_insert')
+@listens_for(Route, 'after_update')
 def update_path_distance(mapper, connection, target):
-    print type(target.path), target.id, target.path
-    # db.session.query(Route).filter_by(id=target.id).update({'distance': 0})
-    # db.session.commit()
+    connection.execute(text('UPDATE route SET distance = ST_Length(path) * 0.000621371 WHERE id = :id'), id=target.id)
 
 class RouteAdmin(ModelView):
     column_auto_select_related = True
