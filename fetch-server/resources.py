@@ -5,6 +5,7 @@ from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
+from sqlalchemy import func, asc
 
 import json
 import copy
@@ -15,10 +16,9 @@ import utils
 api = utils.get_api()
 db = utils.get_db()
 
-def surface_type_checker(value):
-    if value not in Surface.types:
-        raise ValueError("Surface type is not valid")
-    return value
+def latlong_to_sql(coord):
+    t = 'SRID=%d;POINT(%.6f %.6f)' % (utils.get_default_srid(), coord['longitude'], coord['latitude'])
+    return func.ST_GeogFromText(t)
 
 # GET parameters for the search
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -30,11 +30,12 @@ search_parser.add_argument('is_water',        type=inputs.boolean,       store_m
 search_parser.add_argument('is_garbage_can',  type=inputs.boolean,       store_missing=False)
 search_parser.add_argument('has_parking_lot', type=inputs.boolean,       store_missing=False)
 search_parser.add_argument('is_poop_bag',     type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('surface',         type=surface_type_checker, store_missing=False)
+search_parser.add_argument('surface',         type=str,                  store_missing=False, choices=Surface.types)
 search_parser.add_argument('min_distance',    type=float,                store_missing=False) # in miles
 search_parser.add_argument('max_distance',    type=float,                store_missing=False) # in miles
-# search_parser.add_argument('latitude',        type=float,                store_missing=False)
-# search_parser.add_argument('longitude',       type=float,                store_missing=False)
+search_parser.add_argument('latitude',        type=float,                store_missing=False)
+search_parser.add_argument('longitude',       type=float,                store_missing=False)
+search_parser.add_argument('radius',          type=float,                store_missing=False) # in miles
 
 # GET parameters for wildlife
 wildlife_type_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -176,7 +177,30 @@ class RouteResource(Resource):
         
         for (arg,call) in filters:
             q = self.update_filter(q, args, arg, call)
+            
+        latitude  = None
+        longitude = None
+        radius    = None
         
+        if 'latitude' in args:
+            latitude = args['latitude']
+            args.pop('latitude')
+        if 'longitude' in args:
+            longitude = args['longitude']
+            args.pop('longitude')
+        if 'radius' in args:
+            radius = args['radius']
+            args.pop('radius')
+            
+        if latitude is not None and longitude is not None :
+            sql_point = latlong_to_sql({'latitude'  : latitude,
+                                        'longitude' : longitude})
+            
+            filter_radius = lambda q, radius: q.filter(func.ST_Distance(Route.path, sql_point) <= 1609.34 * radius)
+            
+            q = self.update_filter(q, args, 'radius', filter_radius)
+            q = q.order_by(func.ST_Distance(Route.path, sql_point).asc())
+
         results = q.filter_by(**args).all()
         return results
         

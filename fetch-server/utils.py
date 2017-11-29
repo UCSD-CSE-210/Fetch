@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from flask_cors import CORS
 
-from sqlalchemy import func
-
 app = Flask(__name__)
 CORS(app)
 app.config.from_pyfile('config.py')
@@ -27,6 +25,3 @@ def get_default_srid():
 def get_ucsdcse_latlong():
     return {'latitude':    32.881833, 
             'longitude': -117.233336}
-
-def latlong_to_sql(coord):
-    return func.ST_GeogFromText('SRID=%d;POINT(%.6f %.6f)' % (get_default_srid(), coord['longitude'], coord['latitude']))
