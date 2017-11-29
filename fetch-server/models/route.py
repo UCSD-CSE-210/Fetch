@@ -4,6 +4,8 @@ from flask_admin.contrib.geoa import ModelView
 from flask_security import current_user
 from geoalchemy2.types import Geometry
 
+from image import RouteImage
+
 try:
     from .. import utils
 except ValueError:
