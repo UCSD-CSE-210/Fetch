@@ -8,6 +8,8 @@ from sqlalchemy.sql import text
 
 import surface
 
+from image import RouteImage
+
 try:
     from .. import utils
 except ValueError:

@@ -7,9 +7,12 @@ Fetch Flask App
 2. Install all of the dependencies
     - `pip install -r requirements.txt`
 3. Create the database
-    - `python create_db.py`
+    - `FLASK_CONFIG_FILE=config.py python create_db.py`
+    - `FLASK_CONFIG_FILE=test_config.py python create_test_db.py`
+        - You need to create two postgres databases. The test one should be called `fetch_db_test`. This is needed because the unittests will delete all the data after each test. Ultimately, postgres should be mocked out, but we can do that later.
 4. Start the server
-    - `FLASK_APP=fetch.py flask run`
+    - `FLASK_APP=fetch.py FLASK_CONFIG_FILE=config.py flask run --host=0.0.0.0`
+
 
 #### Installing PostgreSQL locally
 

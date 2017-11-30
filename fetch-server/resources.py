@@ -7,6 +7,8 @@ from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
 from sqlalchemy import func, asc
 
+from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
+
 import json
 import copy
 
@@ -15,6 +17,10 @@ import utils
 
 api = utils.get_api()
 db = utils.get_db()
+
+# Managers
+wildlifetype_manager = WildlifeTypeManager(db)
+wildlife_manager = WildlifeManager(db)
 
 # GET parameters for the search
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -66,10 +72,21 @@ class WildlifeTypeField(fields.Raw):
 class LocationField(fields.Raw):
     def format(self, loc):
         point = to_shape(loc).coords[:]
-        print point
         return {
             'latitude'  : point[0][0],
             'longitude' : point[0][1]
+        }
+
+class RouteField(fields.Raw):
+    def format(self, route):
+        return {
+            'id': route.id,
+            'name': route.name,
+            'address': route.address,
+            'is_shade': route.is_shade,
+            'is_water': route.is_water,
+            'is_garbage_can': route.is_garbage_can,
+            'is_poop_bag': route.is_poop_bag,
         }
 
 class ImageField(fields.Raw):
@@ -102,7 +119,8 @@ wildlife_type_fields = {
 wildlife_fields = {
     'id' : fields.Integer,
     'wildlifetype' : WildlifeTypeField,
-    'location': LocationField
+    'location': LocationField,
+    'route': RouteField
 }
 
 # filter & respond to the search query
@@ -220,9 +238,7 @@ class WildlifeTypeResource(Resource):
     @marshal_with(wildlife_type_fields, envelope='results')
     def get(self):
         args = wildlife_type_parser.parse_args(strict=True)
-        q = WildlifeType.query
-        results = q.filter_by(**args).all()
-        return results
+        return wildlifetype_manager.select(args)
     
     '''
     JSON payload
@@ -234,11 +250,7 @@ class WildlifeTypeResource(Resource):
     @marshal_with(wildlife_type_fields, envelope='results')
     def post(self):
         args = wildlife_type_post_parser.parse_args(strict=True)
-        wt = WildlifeType(name         = args['name'],
-                          is_dangerous = args['is_dangerous'])
-        db.session.add(wt)
-        db.session.commit()
-        return wt
+        return wildlifetype_manager.insert(args['name'], args['is_dangerous'])
 
 class WildlifeResource(Resource):
     '''
@@ -250,12 +262,7 @@ class WildlifeResource(Resource):
     @marshal_with(wildlife_fields, envelope='results')
     def get(self):
         args = wildlife_parser.parse_args(strict=True)
-        q = Wildlife.query
-        if 'route' in args:
-            q = q.filter(Wildlife.route_id == args['route'])
-        if 'is_dangerous' in args:
-            q = q.filter(Wildlife.wildlifetype.has(is_dangerous=args['is_dangerous']))
-        return q.all()
+        return wildlife_manager.select(args.get('route'), args.get('is_dangerous'))
 
     '''
     JSON payload
@@ -264,18 +271,18 @@ class WildlifeResource(Resource):
         "location": {
             "latitude": 100.0,
             "longitude": 123.23
-        }
+        },
+        "route": 2
     }
     '''
     @marshal_with(wildlife_fields, envelope='results')
     def post(self):
         args = wildlife_parser.parse_args(strict=True)
-        point = [args['location']['latitude'], args['location']['longitude']]
-        wildlife = Wildlife(wildlifetype_id = args['wildlifetype'],
-                            location = from_shape(Point(point)))
-        db.session.add(wildlife)
-        db.session.commit()
-        return wildlife
+        lat = args['location']['latitude']
+        lon = args['location']['longitude']
+        wildlifetype = args['wildlifetype']
+        route = args['route']
+        return wildlife_manager.insert(lat, lon, wildlifetype, route)
 
 
 # Add the resources to the app

@@ -23,7 +23,6 @@ db = utils.get_db()
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-
 # Initialize the admin interface
 admin = Admin(app, name='fetch', template_mode='bootstrap3')
 admin.add_view(UserAdmin(User, db.session))
