@@ -18,3 +18,9 @@ def get_app():
 def get_api():
     return api
 
+def get_default_srid():
+    return 4326
+
+def get_ucsdcse_latlong():
+    return {'latitude':    32.881833, 
+            'longitude': -117.233336}
