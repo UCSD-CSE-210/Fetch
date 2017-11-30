@@ -16,26 +16,22 @@ import utils
 api = utils.get_api()
 db = utils.get_db()
 
-def latlong_to_sql(coord):
-    t = 'SRID=%d;POINT(%.6f %.6f)' % (utils.get_default_srid(), coord['longitude'], coord['latitude'])
-    return func.ST_GeogFromText(t)
-
 # GET parameters for the search
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
-search_parser.add_argument('id',              type=int,                  store_missing=False)
-search_parser.add_argument('name',            type=str,                  store_missing=False)
-search_parser.add_argument('address',         type=str,                  store_missing=False)
-search_parser.add_argument('is_shade',        type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('is_water',        type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('is_garbage_can',  type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('has_parking_lot', type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('is_poop_bag',     type=inputs.boolean,       store_missing=False)
-search_parser.add_argument('surface',         type=str,                  store_missing=False, choices=Surface.types)
-search_parser.add_argument('min_distance',    type=float,                store_missing=False) # in miles
-search_parser.add_argument('max_distance',    type=float,                store_missing=False) # in miles
-search_parser.add_argument('latitude',        type=float,                store_missing=False)
-search_parser.add_argument('longitude',       type=float,                store_missing=False)
-search_parser.add_argument('radius',          type=float,                store_missing=False) # in miles
+search_parser.add_argument('id',              type=int,            store_missing=False)
+search_parser.add_argument('name',            type=str,            store_missing=False)
+search_parser.add_argument('address',         type=str,            store_missing=False)
+search_parser.add_argument('is_shade',        type=inputs.boolean, store_missing=False)
+search_parser.add_argument('is_water',        type=inputs.boolean, store_missing=False)
+search_parser.add_argument('is_garbage_can',  type=inputs.boolean, store_missing=False)
+search_parser.add_argument('has_parking_lot', type=inputs.boolean, store_missing=False)
+search_parser.add_argument('is_poop_bag',     type=inputs.boolean, store_missing=False)
+search_parser.add_argument('surface',         type=str,            store_missing=False, choices=Surface.types)
+search_parser.add_argument('min_distance',    type=float,          store_missing=False) # in miles
+search_parser.add_argument('max_distance',    type=float,          store_missing=False) # in miles
+search_parser.add_argument('latitude',        type=float)
+search_parser.add_argument('longitude',       type=float)
+search_parser.add_argument('radius',          type=float,          store_missing=False) # in miles
 
 # GET parameters for wildlife
 wildlife_type_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -120,6 +116,12 @@ class RouteResource(Resource):
       is_water       : Has water?
       is_garbage_can : Has garbage can?
       is_poop_bag    : Has poop bag?
+      surface        : Surface type of the route
+      min_distance   : Min length of the route
+      max_distance   : Max length of the route
+      latitude       : Current location's latitude
+      longitude      : Current location's longitude
+      radius         : Used to search routes within the given radius to the current location
     
     - All parameters are optional. 
     - If an `id` is not given, search will be done on all routes with the rest
@@ -129,16 +131,64 @@ class RouteResource(Resource):
     JSON Response:
     { 'results' : [route1, route2, ...] }
     where each route object contains the following:
-    id, name, address, is_shade, is_water, is_garbage_can, is_poop_bag, coodinates, images
+    id, name, address, is_shade, is_water, is_garbage_can, is_poop_bag, coodinates, images, surface, distance
     
     Coordinates is a list of objects that contain latitude and longitude fields
     Images is a list of objects that contain image_id and image_url fields.
     '''
+    @marshal_with(route_fields, envelope='results')
+    def get(self):
+        args = search_parser.parse_args(strict=True)
+
+        if 'id' in args:
+            route = Route.query.get(args['id'])
+            return [route] if route is not None else []
+
+        q = Route.query
+        
+        # ######################################################################
+        # filter only if the following features are wanted
+        # (i.e. ignores if they are not wanted)
+        # ######################################################################
+        feature_flags = ['is_shade', 'is_water', 'is_garbage_can', 'has_parking_lot', 'is_poop_bag']
+        
+        for f in feature_flags:
+            if f in args and args[f]:
+                q = q.filter_by(**{f : True})
+        # ######################################################################
+        # handle parameters that require special care
+        # ######################################################################
+        filters = [('name',         self.filter_name),
+                   ('address',      self.filter_address),
+                   ('surface',      self.filter_surface),
+                   ('min_distance', self.filter_min_distance),
+                   ('max_distance', self.filter_max_distance)]
+                   
+        for (arg,call) in filters:
+            q = self.update_filter(q, args, arg, call)
+        # ######################################################################
+        # handle geographical filters
+        # ######################################################################
+        latitude  = args['latitude']
+        longitude = args['longitude']
+        
+        if latitude is not None and longitude is not None :
+            sql_point = self.latlong_to_sql({'latitude'  : latitude,
+                                             'longitude' : longitude})
+            
+            q = q.order_by(func.ST_Distance(Route.path, sql_point).asc())
+            
+            if 'radius' in args:
+                radius = args['radius']
+                q = q.filter(func.ST_Distance(Route.path, sql_point) <= 1609.34 * radius)
+        # ######################################################################
+
+        results = q.all()
+        return results
     
     def update_filter(self, q, args, arg_name, call):
         if arg_name in args:
             arg = args[arg_name]
-            args.pop(arg_name)
             return call(q, arg)
         else:
             return q
@@ -158,51 +208,9 @@ class RouteResource(Resource):
     def filter_max_distance(self, q, max_distance):
         return q.filter(Route.distance <= max_distance)
 
-    @marshal_with(route_fields, envelope='results')
-    def get(self):
-        args = search_parser.parse_args(strict=True)
-        print "args:", args
-
-        if 'id' in args:
-            route = Route.query.get(args['id'])
-            return [route] if route is not None else []
-
-        q = Route.query
-        
-        filters = [('name',         self.filter_name),
-                   ('address',      self.filter_address),
-                   ('surface',      self.filter_surface),
-                   ('min_distance', self.filter_min_distance),
-                   ('max_distance', self.filter_max_distance)]
-        
-        for (arg,call) in filters:
-            q = self.update_filter(q, args, arg, call)
-            
-        latitude  = None
-        longitude = None
-        radius    = None
-        
-        if 'latitude' in args:
-            latitude = args['latitude']
-            args.pop('latitude')
-        if 'longitude' in args:
-            longitude = args['longitude']
-            args.pop('longitude')
-        if 'radius' in args:
-            radius = args['radius']
-            args.pop('radius')
-            
-        if latitude is not None and longitude is not None :
-            sql_point = latlong_to_sql({'latitude'  : latitude,
-                                        'longitude' : longitude})
-            
-            filter_radius = lambda q, radius: q.filter(func.ST_Distance(Route.path, sql_point) <= 1609.34 * radius)
-            
-            q = self.update_filter(q, args, 'radius', filter_radius)
-            q = q.order_by(func.ST_Distance(Route.path, sql_point).asc())
-
-        results = q.filter_by(**args).all()
-        return results
+    def latlong_to_sql(self, coord):
+        t = 'SRID=%d;POINT(%.6f %.6f)' % (utils.get_default_srid(), coord['longitude'], coord['latitude'])
+        return func.ST_GeogFromText(t)
         
 class WildlifeTypeResource(Resource):
     '''
