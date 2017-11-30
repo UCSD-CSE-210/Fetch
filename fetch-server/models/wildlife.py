@@ -3,7 +3,7 @@ from flask import Flask
 from flask_security import current_user
 from flask_admin.contrib.geoa import ModelView
 from geoalchemy2.types import Geometry
-import route
+from route import Route
 
 try:
     from .. import utils
