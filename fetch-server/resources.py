@@ -5,9 +5,9 @@ from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
-from sqlalchemy import func, asc
 
 from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
+from managers.route_manager    import RouteManager
 
 import json
 import copy
@@ -19,6 +19,7 @@ api = utils.get_api()
 db = utils.get_db()
 
 # Managers
+route_manager = RouteManager(db)
 wildlifetype_manager = WildlifeTypeManager(db)
 wildlife_manager = WildlifeManager(db)
 
@@ -157,78 +158,8 @@ class RouteResource(Resource):
     @marshal_with(route_fields, envelope='results')
     def get(self):
         args = search_parser.parse_args(strict=True)
+        return route_manager.search(args)
 
-        if 'id' in args:
-            route = Route.query.get(args['id'])
-            return [route] if route is not None else []
-
-        q = Route.query
-        
-        # ######################################################################
-        # filter only if the following features are wanted
-        # (i.e. ignores if they are not wanted)
-        # ######################################################################
-        feature_flags = ['is_shade', 'is_water', 'is_garbage_can', 'has_parking_lot', 'is_poop_bag']
-        
-        for f in feature_flags:
-            if f in args and args[f]:
-                q = q.filter_by(**{f : True})
-        # ######################################################################
-        # handle parameters that require special care
-        # ######################################################################
-        filters = [('name',         self.filter_name),
-                   ('address',      self.filter_address),
-                   ('surface',      self.filter_surface),
-                   ('min_distance', self.filter_min_distance),
-                   ('max_distance', self.filter_max_distance)]
-                   
-        for (arg,call) in filters:
-            q = self.update_filter(q, args, arg, call)
-        # ######################################################################
-        # handle geographical filters
-        # ######################################################################
-        latitude  = args['latitude']
-        longitude = args['longitude']
-        
-        if latitude is not None and longitude is not None :
-            sql_point = self.latlong_to_sql({'latitude'  : latitude,
-                                             'longitude' : longitude})
-            
-            q = q.order_by(func.ST_Distance(Route.path, sql_point).asc())
-            
-            if 'radius' in args:
-                radius = args['radius']
-                q = q.filter(func.ST_Distance(Route.path, sql_point) <= 1609.34 * radius)
-        # ######################################################################
-
-        results = q.all()
-        return results
-    
-    def update_filter(self, q, args, arg_name, call):
-        if arg_name in args:
-            arg = args[arg_name]
-            return call(q, arg)
-        else:
-            return q
-    
-    def filter_name(self, q, name):
-        return q.filter(Route.name.ilike('%'+name+'%'))
-    
-    def filter_address(self, q, address):
-        return q.filter(Route.address.ilike('%'+address+'%'))
-    
-    def filter_surface(self, q, surface):
-        return q.filter(Route.surface.has(name=surface))
-    
-    def filter_min_distance(self, q, min_distance):
-        return q.filter(Route.distance >= min_distance)
-
-    def filter_max_distance(self, q, max_distance):
-        return q.filter(Route.distance <= max_distance)
-
-    def latlong_to_sql(self, coord):
-        t = 'SRID=%d;POINT(%.6f %.6f)' % (utils.get_default_srid(), coord['longitude'], coord['latitude'])
-        return func.ST_GeogFromText(t)
         
 class WildlifeTypeResource(Resource):
     '''
