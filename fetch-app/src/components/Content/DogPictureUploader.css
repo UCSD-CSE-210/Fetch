@@ -1,0 +1,9 @@
+.preview {
+	display: flex;
+    justify-content: center;
+    margin-bottom: 2%;
+}
+
+.preview-img {
+	width: 80%;
+}

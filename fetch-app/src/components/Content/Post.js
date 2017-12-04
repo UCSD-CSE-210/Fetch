@@ -2,6 +2,7 @@ import React from 'react';
 import "./Post.css";
 import geoViewport from '@mapbox/geo-viewport'
 import WildLifeUploader from './WildLifeUploader'
+import DogPictureUploader from './DogPictureUploader'
 import Lightbox from 'react-image-lightbox';
 
 
@@ -20,6 +21,7 @@ class Post extends React.Component {
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
+        this._submitDogPicture= this._submitDogPicture.bind(this);
         this.closeModal = this.closeModal.bind(this);
     }
 
@@ -102,9 +104,28 @@ class Post extends React.Component {
                                 />});
     }
 
+    _submitDogPicture(event) {
+        event.preventDefault();
+        this.setState({modal: <DogPictureUploader 
+                                trail_id = {this.props.value.id}
+                                trail_name = {this.props.value.name}
+                                closeModal = {this.closeModal}
+                                />});
+    }
+
     closeModal(event) {
         event.preventDefault();
         this.setState({modal: null});
+    }
+
+
+    _displayDistance(distance) {
+        if (!distance)
+            return "Unknown";
+        distance = Math.round(distance * 100)/100;
+        if (!distance)
+            distance = "< 0.005"
+        return distance + " miles";
     }
 
     render() {
@@ -125,6 +146,7 @@ class Post extends React.Component {
                                 Shade: {this._yesOrNo(info.is_shade)}<br/>
                                 Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
                                 Water: {this._yesOrNo(info.is_water)}<br/>
+                                distance: {this._displayDistance(info.distance)}
                                 {this.state.wildlifeInfo}
                             </p>
                         </div>
@@ -169,8 +191,7 @@ class Post extends React.Component {
                                 Capture pictures of dogs
                                 <input
                                     style={{"display": "none"}}
-                                    type="file"
-                                    accept="image/*"
+                                    onClick={this._submitDogPicture}
                                 />
                             </label>
                         </div>
