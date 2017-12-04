@@ -53,3 +53,20 @@ button[type="search"]:hover {
     color: #000000;
     font-size: 14pt;
 }
+
+.surfacebox {
+    color: #FFFFFF;
+}
+
+.radio-inline {
+  margin: 10px;
+}
+
+.surfacebox p {
+  display: inline;
+}
+
+.surfacebox input{
+  margin-right: 5px;
+}
+
