@@ -50,7 +50,10 @@ class SearchBar extends React.Component {
         if (this.selectedCheckBoxes.has('Has garbage can?')) {
             params['is_garbage_can'] = true;
         }
-        params['surface'] = this.surface;
+        if (this.surface && this.surface !== 'all') {
+            params['surface'] = this.surface;
+        }
+
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))

@@ -4,7 +4,7 @@ import geoViewport from '@mapbox/geo-viewport'
 import WildLifeUploader from './WildLifeUploader'
 import DogPictureUploader from './DogPictureUploader'
 import Lightbox from 'react-image-lightbox';
-
+import Weatherbox from './Weatherbox';
 
 class Post extends React.Component {
 
@@ -138,6 +138,7 @@ class Post extends React.Component {
         return (
             <div className="post-card container">
                 <h3><b>{info.name}</b></h3>
+                <Weatherbox/>
                 <div className="row">
                     <div className="col-sm-4">
                         <div>
