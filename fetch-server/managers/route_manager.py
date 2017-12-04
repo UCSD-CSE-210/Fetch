@@ -1,4 +1,5 @@
 from sqlalchemy import func, asc
+from flask_security import current_user
 
 try:
   from ..models.route import Route
@@ -59,6 +60,21 @@ class RouteManager():
 
         results = q.all()
         return results
+    
+    def like(self, args):
+      route_id = args['route_id']
+      r = Route.query.get(route_id)
+
+      if r is None or not current_user.has_role('user'):
+        return []
+
+      if current_user not in r.likes:
+        r.likes.append(current_user)
+        self.db.session.add(r)
+        self.db.session.commit()
+
+      return [r]
+        
 
     def update_filter(self, q, args, arg_name, call):
         if arg_name in args:

@@ -5,6 +5,7 @@ from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
+from flask_security import current_user
 
 from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
 from managers.route_manager    import RouteManager
@@ -57,6 +58,10 @@ wildlife_parser.add_argument('location', type=dict, store_missing=False)
 wildlife_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
 wildlife_parser.add_argument('route', type=int, store_missing=False)
 
+# POST parameters for route liking
+route_like_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
+route_like_parser.add_argument('route_id', type=int, required=True)
+
 class Coordinates(fields.Raw):
     def format(self, wkb):
         coords = to_shape(wkb).coords[:]
@@ -108,7 +113,9 @@ route_fields = {
     'coodinates'      : Coordinates(attribute='path'),
     'images'          : ImageField(attribute='images'),
     'surface'         : fields.String,
-    'distance'        : fields.Float
+    'distance'        : fields.Float,
+    'like_count'      : fields.Integer(attribute=lambda r: len(r.likes)),
+    'can_like'        : fields.Boolean(attribute=lambda r: current_user.has_role('user') and current_user not in r.likes)
 }
 
 wildlife_type_fields = {
@@ -159,6 +166,12 @@ class RouteResource(Resource):
     def get(self):
         args = search_parser.parse_args(strict=True)
         return route_manager.search(args)
+
+class RouteLikeResource(Resource):    
+    @marshal_with(route_fields, envelope='results')
+    def post(self):
+        args = route_like_parser.parse_args(strict=True)
+        return route_manager.like(args)
 
         
 class WildlifeTypeResource(Resource):
@@ -215,8 +228,8 @@ class WildlifeResource(Resource):
         route = args['route']
         return wildlife_manager.insert(lat, lon, wildlifetype, route)
 
-
 # Add the resources to the app
 api.add_resource(RouteResource, '/api/route')
+api.add_resource(RouteLikeResource, '/api/route_like')
 api.add_resource(WildlifeTypeResource, '/api/wildlifetype')
 api.add_resource(WildlifeResource, '/api/wildlife')
