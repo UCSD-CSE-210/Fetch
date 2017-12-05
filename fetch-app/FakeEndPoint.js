@@ -56,9 +56,10 @@ var g = {
             },
         };
 
-var fakeData = [
+var fakeData = {results: [
+    
     {
-        title : 'Trail',
+        name : 'Trail',
         date : 'November 1 2017',
         ratings : '4.8',
         geojson : g,
@@ -67,7 +68,7 @@ var fakeData = [
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     },
     {
-        title : 'Trail',
+        name : 'Trail',
         date : 'November 1 2017',
         ratings : '4.8',
         geojson : g,
@@ -76,11 +77,12 @@ var fakeData = [
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     }
 ]
+}
 
-app.get('/search', function(req, res){
+app.get('/api/route', function(req, res){
     console.log(req.query);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.send(JSON.stringify(fakeData));
 })
 
-app.listen(4000, () => console.log('Example app listening on port 4000!'))
+app.listen(5000, () => console.log('Example app listening on port 5000!'))

@@ -137,8 +137,10 @@ class Post extends React.Component {
         var info = this.props.value;
         return (
             <div className="post-card container">
-                <h3><b>{info.name}</b></h3>
-                <Weatherbox/>
+                <div className='row'>
+                    <h3 className='col-9'><b>{info.name}</b></h3>
+                    <Weatherbox className='col-3'/>
+                </div>
                 <div className="row">
                     <div className="col-sm-4">
                         <div>
