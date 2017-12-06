@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from fetch_test import FetchTestCase
-from managers.wildlife_manager import WildlifeTypeManager
+from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
 
 import utils
 
@@ -33,6 +33,14 @@ class WildlifeTypeTestCase(FetchTestCase):
       assert len(wildlifetypes) == 0
 
 class WildlifeTestCase(FetchTestCase):
+  '''
+    FIXME: Any further testing here depends on having the route manager
+  '''
   def setUp(self):
     super(WildlifeTestCase, self).setUp()
     self.manager = WildlifeManager(self.db)
+    self.wildlifetype_manager = WildlifeTypeManager(self.db)
+
+  def test_empty(self):
+    with self.app.app_context():
+      assert self.manager.select(None, None) == []

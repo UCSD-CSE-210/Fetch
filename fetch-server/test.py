@@ -1,6 +1,6 @@
 import unittest
 
-from test.test_wildlife import WildlifeTypeTestCase
+from test.test_wildlife import WildlifeTypeTestCase, WildlifeTestCase
 
 import utils
 
