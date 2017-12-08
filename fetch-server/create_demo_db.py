@@ -199,8 +199,11 @@ def build_demo_db(db):
                     dog_image = RouteImage(path=unicode(path))
                     rt.images.append(dog_image)
 
+            # finally add the likes
+            for u in r_info[name]['likes']:
+                rt.likes.append(u)
+
             db.session.add(rt)
-                
         
         # ######################################################################
         # done adding stuff, now commit

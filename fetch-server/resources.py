@@ -79,8 +79,8 @@ class LocationField(fields.Raw):
     def format(self, loc):
         point = to_shape(loc).coords[:]
         return {
-            'latitude'  : point[0][0],
-            'longitude' : point[0][1]
+            'latitude'  : point[0][1],
+            'longitude' : point[0][0]
         }
 
 class RouteField(fields.Raw):
