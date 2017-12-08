@@ -7,6 +7,7 @@ from models.image import RouteImage, RouteImageAdmin, WildlifeImage, WildlifeIma
 from models.route import Route, RouteAdmin
 from models.user import User, Role, UserAdmin
 from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
+from models.weather import Weather, WeatherAdmin
 
 import utils
 
@@ -31,6 +32,7 @@ admin.add_view(WildlifeTypeAdmin(WildlifeType, db.session))
 admin.add_view(WildlifeAdmin(Wildlife, db.session))
 admin.add_view(RouteImageAdmin(RouteImage, db.session))
 admin.add_view(WildlifeImageAdmin(WildlifeImage, db.session))
+admin.add_view(WeatherAdmin(Weather, db.session))
 
 route_images = UploadSet('route', IMAGES, default_dest=(lambda app: app.config['FS_ROUTE_IMAGES_ROOT']))
 wildlife_images = UploadSet('wildlife', IMAGES, default_dest=(lambda app: app.config['FS_WILDLIFE_IMAGES_ROOT']))

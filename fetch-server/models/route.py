@@ -7,6 +7,7 @@ from geoalchemy2.types import Geography
 from sqlalchemy.sql import text
 
 import surface
+import weather
 
 from image import RouteImage
 
@@ -37,7 +38,9 @@ class Route(db.Model):
     images          = db.relationship('RouteImage')
     surface_id      = db.Column(db.Integer, db.ForeignKey('surface.id'), nullable=False)
     surface         = db.relationship('Surface')
-    
+
+    weather_id      = db.Column(db.Integer, db.ForeignKey('weather.id'), nullable=False)
+    weather         = db.relationship('Weather')
 
     def __str__(self):
         return self.name

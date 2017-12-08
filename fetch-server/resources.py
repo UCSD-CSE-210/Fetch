@@ -8,6 +8,7 @@ from shapely.geometry import Point
 from sqlalchemy import func, asc
 
 from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
+from managers.weather_manager import WeatherManager
 
 import json
 import copy
@@ -21,6 +22,7 @@ db = utils.get_db()
 # Managers
 wildlifetype_manager = WildlifeTypeManager(db)
 wildlife_manager = WildlifeManager(db)
+weather_manager = WeatherManager(db)
 
 # GET parameters for the search
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
@@ -55,6 +57,15 @@ wildlife_parser.add_argument('wildlifetype', type=int, store_missing=False)
 wildlife_parser.add_argument('location', type=dict, store_missing=False)
 wildlife_parser.add_argument('is_dangerous', type=inputs.boolean, store_missing=False)
 wildlife_parser.add_argument('route', type=int, store_missing=False)
+
+# GET parameters for weather
+weather_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
+weather_parser.add_argument('address', type=str, store_missing=False)
+weather_parser.add_argument('temperature', type=int, store_missing=False)
+weather_parser.add_argument('sunny', type=inputs.boolean, store_missing=False)
+weather_parser.add_argument('cloudy', type=inputs.boolean, store_missing=False)
+weather_parser.add_argument('rainy', type=inputs.boolean, store_missing=False)
+weather_parser.add_argument('timestamp', type=int, store_missing=False)
 
 class Coordinates(fields.Raw):
     def format(self, wkb):
@@ -95,6 +106,16 @@ class ImageField(fields.Raw):
                                 'image_url': url_for('download_image', image_id=img.id)},
                    imgs)
 
+class WeatherField(fields.Raw):
+    def format(self, weather):
+        return {
+            'id': weather.id,
+            'temperature': weather.temperature,
+            'cloudy': weather.cloudy,
+            'sunny': weather.sunny,
+            'rainy': weather.rainy
+        }
+
 route_fields = {
     'id'              : fields.Integer,
     'name'            : fields.String,
@@ -107,7 +128,8 @@ route_fields = {
     'coodinates'      : Coordinates(attribute='path'),
     'images'          : ImageField(attribute='images'),
     'surface'         : fields.String,
-    'distance'        : fields.Float
+    'distance'        : fields.Float,
+    'weather'         : WeatherField
 }
 
 wildlife_type_fields = {
@@ -121,6 +143,15 @@ wildlife_fields = {
     'wildlifetype' : WildlifeTypeField,
     'location': LocationField,
     'route': RouteField
+}
+
+weather_fields = {
+    'id'          : fields.Integer,
+    'temperature' : fields.Integer,
+    'sunny'       : fields.Boolean,
+    'cloudy'      : fields.Boolean,
+    'rainy'       : fields.Boolean,
+    'timestamp'   : fields.Integer
 }
 
 # filter & respond to the search query
@@ -284,8 +315,26 @@ class WildlifeResource(Resource):
         route = args['route']
         return wildlife_manager.insert(lat, lon, wildlifetype, route)
 
+class WeatherResource(Resource):
+    '''
+
+    '''
+    @marshal_with(weather_fields, envelope='results')
+    def get(self):
+        args = weather_parser.parse_args(strict=True)
+        return weather_manager.select(args)
+    
+    @marshal_with(weather_fields, envelope='results')
+    def post(self):
+        args = weather_parser.parse_args(strict=True)
+        temperature = args['temperature']
+        sunny = args['sunny']
+        cloudy = args['cloudy']
+        rainy = args['rainy']
+        return weather_manager.insert(temperature, sunny, cloudy, rainy)
 
 # Add the resources to the app
 api.add_resource(RouteResource, '/api/route')
 api.add_resource(WildlifeTypeResource, '/api/wildlifetype')
 api.add_resource(WildlifeResource, '/api/wildlife')
+api.add_resource(WeatherResource, '/api/weather')
