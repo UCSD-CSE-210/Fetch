@@ -12,6 +12,7 @@ from models.wildlife import WildlifeType
 from models.image    import RouteImage, WildlifeImage
 
 from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
+from managers.weather_manager  import WeatherManager
 
 from shapely.geometry import LineString
 from geoalchemy2.shape import from_shape
@@ -97,6 +98,7 @@ def build_demo_db(db):
         # ######################################################################
         
         routes = {}
+        weatherManager = WeatherManager(db)
         
         with open(op.join(op.dirname(op.realpath(__file__)), 'test', 'routes.json')) as data_file:    
             srid = utils.get_default_srid()
@@ -106,6 +108,11 @@ def build_demo_db(db):
                 if name in blacklisted_routes:
                     continue
 
+                w  = weatherManager.insert(r["weather"]["temperature"],
+                                           r["weather"]["sunny"],
+                                           r["weather"]["cloudy"],
+                                           r["weather"]["rainy"])
+
                 rt = Route(name            = name,
                            address         = str(r['address']),
                            is_shade        = r['is_shade'],
@@ -114,6 +121,7 @@ def build_demo_db(db):
                            is_poop_bag     = r['is_poop_bag'],
                            has_parking_lot = r['has_parking_lot'],
                            surface         = surface_types[r['surface']],
+                           weather         = w,
                            path            = 'SRID=%d;%s' % (srid, r['pathstr']))
                 
                 db.session.add(rt)
