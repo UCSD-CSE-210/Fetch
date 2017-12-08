@@ -22,3 +22,6 @@ FS_ROUTE_IMAGES_ROOT    = op.join(FS_IMAGES_ROOT, 'route')
 FS_WILDLIFE_IMAGES_ROOT = op.join(FS_IMAGES_ROOT, 'wildlife')
 
 UPLOADED_IMAGES_DEST = FS_IMAGES_ROOT
+
+# suppress the stupid warning message
+SQLALCHEMY_TRACK_MODIFICATIONS = False

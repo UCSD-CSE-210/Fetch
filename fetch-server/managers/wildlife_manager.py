@@ -35,7 +35,7 @@ class WildlifeManager():
     return q.all()
 
   def insert(self, lat, lon, wildlifetype, routeid):
-    point = [lat, lon]
+    point = [lon, lat]
     location = from_shape(Point(point))
     wildlife = Wildlife(wildlifetype_id = wildlifetype,
                         location = location,
