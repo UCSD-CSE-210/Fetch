@@ -3,7 +3,7 @@ import os.path as op
 import json
 
 import utils
-from fetch import app, user_datastore, wildlife_images
+from fetch import app, user_datastore, wildlife_images, route_images
 
 from models.user     import Role
 from models.route    import Route
@@ -22,6 +22,8 @@ if 'IMAGE_ROOT_FOLDER' in os.environ:
 else:
     print "need to pass IMAGE_ROOT_FOLDER as an env var"
     sys.exit(1)
+    
+blacklisted_routes = ['UCSD']
     
 def build_demo_db(db):
     db.drop_all()
@@ -43,6 +45,28 @@ def build_demo_db(db):
             password='admin',
             roles=[user_role, super_user_role]
         )
+
+        user1 = user_datastore.create_user(
+            first_name='User1',
+            email='user1',
+            password='user1',
+            roles=[user_role]
+        )
+
+        user2 = user_datastore.create_user(
+            first_name='User2',
+            email='user2',
+            password='user2',
+            roles=[user_role]
+        )
+
+        user3 = user_datastore.create_user(
+            first_name='User3',
+            email='user3',
+            password='user3',
+            roles=[user_role]
+        )
+        
 
         # ######################################################################
         # surface types
@@ -79,6 +103,9 @@ def build_demo_db(db):
 
             for r in json.load(data_file):
                 name = str(r['name'])
+                if name in blacklisted_routes:
+                    continue
+
                 rt = Route(name            = name,
                            address         = str(r['address']),
                            is_shade        = r['is_shade'],
@@ -99,46 +126,63 @@ def build_demo_db(db):
         # adding wildlife & images to routes
         # ######################################################################
 
-        route_images = {}
-
         r_info = {'Rose Canyon'                 : {"wildlife" : [(rs_tup, 32.846425, -117.234018), 
                                                                  (co_tup, 32.842309, -117.234618)], 
-                                                   "images"   : []}, 
+                                                   "route"    : ["01_Devin-Go-Pro-Recap-3.jpg",
+                                                                 "19_Wroe-Addi-Roothie-proof-2014-2-300x300.jpg",
+                                                                 "02_dog_running_grass_trail_106484_1920x1080.jpg"],
+                                                   "likes"    : [user1, user2, user3]}, 
 
                   'Torrey Pines'                : {"wildlife" : [(rc_tup, 32.915889, -117.256696)],
-                                                   "images"   : []}, 
+                                                   "route"    : ["03_MG_6586.jpg",
+                                                                 "04_n02089867_2365.jpg"],
+                                                   "likes"    : []}, 
 
                   'La Jolla Shores'             : {"wildlife" : [(rc_tup, 32.875135, -117.250941)],
-                                                   "images"   : []}, 
+                                                   "route"    : ["05_n02091032_3886.jpg",
+                                                                 "06_n02091635_2089.jpg"],
+                                                   "likes"    : [user1, user3]}, 
 
                   'Deerfield loop'              : {"wildlife" : [],
-                                                   "images"   : []}, 
+                                                   "route"    : ["07_n02093754_6453.jpg",
+                                                                 "08_n02094258_2842.jpg"],
+                                                   "likes"    : [user1, user2, user3]}, 
 
                   'Mission Trails Visitor Loop' : {"wildlife" : [],
-                                                   "images"   : []},
+                                                   "route"    : ["09_n02094433_3881.jpg",
+                                                                 "10_n02095314_1835.jpg"],
+                                                   "likes"    : [user2]},
 
                   'Cowles Mountain Trail'       : {"wildlife" : [(co_tup, 32.809915, -117.031812)],
-                                                   "images"   : []}, 
+                                                   "route"    : ["11_n02096585_1624.jpg",
+                                                                 "12_n02099267_1274.jpg"],
+                                                   "likes"    : []}, 
 
                   'Balboa Park'                 : {"wildlife" : [], 
-                                                   "images"   : []}, 
+                                                   "route"    : ["13_n02100735_5978.jpg",
+                                                                 "18_trailrun_1000.jpg",
+                                                                 "14_n02102318_8534.jpg"],
+                                                   "likes"    : [user1, user2]}, 
 
                   'Par Course Trails'           : {"wildlife" : [(rs_tup, 32.886725, -117.237773)], 
-                                                   "images"   : []},
-
-                  'UCSD'                        : {"wildlife" : [], 
-                                                   "images"   : []}
+                                                   "route"    : ["15_n02112706_549.jpg",
+                                                                 "16_n02113023_3885.jpg",
+                                                                 "17_Short Distance Breeds.jpg"],
+                                                   "likes"    : [user3]}
         }
-
+        
         wm = WildlifeManager(db)
 
         for name in r_info:
             assert name in routes
             rt = routes[name]
 
+            assert rt.id > 0
+
+            # first, add wildlifes
             for ((wildlife_type, wildlife_image_name), lat, lng) in r_info[name]['wildlife']:
                 
-                assert wildlife_type.id > 0 and rt.id > 0
+                assert wildlife_type.id > 0
                 wildlife_instance = wm.insert(lat, lng, wildlife_type.id, rt.id)
 
                 with open(op.join(IMAGE_ROOT_FOLDER, 'wildlife', wildlife_image_name), 'rb') as fp:
@@ -147,6 +191,16 @@ def build_demo_db(db):
                     wildlife_instance.images.append(wildlife_image)
                     db.session.add(wildlife_instance)
                     db.session.add(wildlife_image)
+                    
+            # second, add dog images
+            for dog_image_name in r_info[name]['route']:
+                with open(op.join(IMAGE_ROOT_FOLDER, 'route', dog_image_name), 'rb') as fp:
+                    path      = route_images.save(FileStorage(fp))
+                    dog_image = RouteImage(path=unicode(path))
+                    rt.images.append(dog_image)
+
+            db.session.add(rt)
+                
         
         # ######################################################################
         # done adding stuff, now commit
