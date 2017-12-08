@@ -60,18 +60,24 @@ var fakeData = {results: [
     
     {
         name : 'Trail',
+        id: '1',
         date : 'November 1 2017',
         ratings : '4.8',
         geojson : g,
+        like_count: 20,
+        can_like: true,
         viewpoint : "-117.234104275703,32.8817946493596,13.67",
         imgs: 'https://dog.ceo/api/img/retriever-golden/n02099601_3007.jpg',
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     },
     {
         name : 'Trail',
+        id: '2',
         date : 'November 1 2017',
         ratings : '4.8',
         geojson : g,
+        like_count: 22,
+        can_like: true,
         viewpoint : "-117.234104275703,32.8817946493596,13.67",
         imgs: 'https://dog.ceo/api/img/retriever-golden/n02099601_3007.jpg',
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'

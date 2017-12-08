@@ -18,10 +18,14 @@ class Post extends React.Component {
             photoIndex: 0,
             isOpen: false,
             images: [],
+            likeCount: this.props.value.like_count,
+            canLike: this.props.value.can_like,
+            likeAble: this.props.value.can_like,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
         this._submitDogPicture= this._submitDogPicture.bind(this);
+        this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
     }
 
@@ -113,6 +117,24 @@ class Post extends React.Component {
                                 />});
     }
 
+    _like(event){
+        event.preventDefault();
+        var thumbsUp = document.getElementById("like_id" + this.props.value.id);
+
+        if (!this.state.canLike) {
+            return;
+        }else if(this.state.likeAble){
+            this.setState({likeCount: this.state.likeCount + 1});
+            this.setState({likeAble: !this.state.likeAble});
+            console.log(thumbsUp);
+            thumbsUp.classList.add("liked");
+        }else if(!this.state.likeAble){
+            this.setState({likeCount: this.state.likeCount - 1});
+            this.setState({likeAble: !this.state.likeAble});
+            thumbsUp.classList.remove("liked");
+        }
+    }
+
     closeModal(event) {
         event.preventDefault();
         this.setState({modal: null});
@@ -161,6 +183,7 @@ class Post extends React.Component {
                                 onClick={() => this.setState({isOpen: true})}
                             />
                         </div>
+                        
                         {isOpen &&
                             <Lightbox className="post-img"
                                 mainSrc={images[photoIndex]}
@@ -181,6 +204,14 @@ class Post extends React.Component {
                     <div className="col-sm-8">
                         <div className="post-img">
                             <img className='map img-responsive' alt="trail map" src={this.state.mapURL}/>
+                            <div className="like-box">
+                                {(this.state.canLike) &&
+                                    <span id={"like_id" + info.id} className="fa fa-thumbs-up fa-2x" onClick={this._like}></span>}
+                                {!(this.state.canLike) &&
+                                    <span className="fa fa-thumbs-up fa-2x unclickable"></span>
+                                }
+                                <p>{this.state.likeCount}</p>
+                            </div>
                         </div>
                         <div>
                             <label className="btn  btn-primary col-sm-12 post-btn">
