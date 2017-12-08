@@ -1,21 +1,21 @@
+import os, errno, sys
+import os.path as op
+import json
+
 import utils
 from fetch import app, user_datastore, wildlife_images
 
-from models.user import Role
-from models.route import Route
-from models.surface import Surface
+from models.user     import Role
+from models.route    import Route
+from models.surface  import Surface
 from models.wildlife import WildlifeType
-from models.image import RouteImage, WildlifeImage
+from models.image    import RouteImage, WildlifeImage
 
 from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
 
 from shapely.geometry import LineString
 from geoalchemy2.shape import from_shape
-import os, errno, sys
-import os.path as op
-import json
 from werkzeug.datastructures import FileStorage
-
 
 if 'IMAGE_ROOT_FOLDER' in os.environ:
     IMAGE_ROOT_FOLDER = os.environ['IMAGE_ROOT_FOLDER']
@@ -101,13 +101,14 @@ def build_demo_db(db):
 
         route_images = {}
 
-        r_info = {'Rose Canyon'                 : {"wildlife" : [rs_tup, co_tup], 
+        r_info = {'Rose Canyon'                 : {"wildlife" : [(rs_tup, 32.846425, -117.234018), 
+                                                                 (co_tup, 32.842309, -117.234618)], 
                                                    "images"   : []}, 
 
-                  'Torrey Pines'                : {"wildlife" : [rc_tup],
+                  'Torrey Pines'                : {"wildlife" : [(rc_tup, 32.915889, -117.256696)],
                                                    "images"   : []}, 
 
-                  'La Jolla Shores'             : {"wildlife" : [rc_tup],
+                  'La Jolla Shores'             : {"wildlife" : [(rc_tup, 32.875135, -117.250941)],
                                                    "images"   : []}, 
 
                   'Deerfield loop'              : {"wildlife" : [],
@@ -116,13 +117,13 @@ def build_demo_db(db):
                   'Mission Trails Visitor Loop' : {"wildlife" : [],
                                                    "images"   : []},
 
-                  'Cowles Mountain Trail'       : {"wildlife" : [co_tup],
+                  'Cowles Mountain Trail'       : {"wildlife" : [(co_tup, 32.809915, -117.031812)],
                                                    "images"   : []}, 
 
                   'Balboa Park'                 : {"wildlife" : [], 
                                                    "images"   : []}, 
 
-                  'Par Course Trails'           : {"wildlife" : [rs_tup], 
+                  'Par Course Trails'           : {"wildlife" : [(rs_tup, 32.886725, -117.237773)], 
                                                    "images"   : []},
 
                   'UCSD'                        : {"wildlife" : [], 
@@ -135,8 +136,7 @@ def build_demo_db(db):
             assert name in routes
             rt = routes[name]
 
-            for wildlife_type, wildlife_image_name in r_info[name]['wildlife']:
-                lat, lng = (0,0)
+            for ((wildlife_type, wildlife_image_name), lat, lng) in r_info[name]['wildlife']:
                 
                 assert wildlife_type.id > 0 and rt.id > 0
                 wildlife_instance = wm.insert(lat, lng, wildlife_type.id, rt.id)
