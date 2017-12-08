@@ -39,6 +39,8 @@ class Weatherbox extends React.Component {
             case 'Windy':
                 icon = require('./weather/windy.svg');
                 break;
+            default:
+                console.log('cannot identifiy '+this.state.weather);
         }
 
         return (

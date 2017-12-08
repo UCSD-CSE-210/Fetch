@@ -1,0 +1,15 @@
+.surfacebox {
+    color: #FFFFFF;
+}
+
+.radio-inline {
+  margin: 10px;
+}
+
+.surfacebox p {
+  display: inline;
+}
+
+.surfacebox input{
+  margin-right: 5px;
+}

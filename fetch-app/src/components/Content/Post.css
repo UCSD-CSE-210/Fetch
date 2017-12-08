@@ -45,3 +45,25 @@ h3{
 .post-btn{
   margin-bottom: 10px;
 }
+
+.inactive {
+  color: gray;
+}
+
+.like-box{
+  text-align: right;
+}
+
+.like-box p{
+  display: inline-block;
+  margin-left: 10px;
+  margin-bottom: 0;
+}
+
+.liked {
+  color: red;
+}
+
+.unclickable{
+  color: gray;
+}

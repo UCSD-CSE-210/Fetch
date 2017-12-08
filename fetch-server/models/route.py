@@ -18,6 +18,12 @@ except ValueError:
 
 db  = utils.get_db()
 
+route_likes = db.Table(
+    'route_likes', 
+    db.Column('route_id', db.Integer, db.ForeignKey('route.id')),
+    db.Column('user_id',  db.Integer, db.ForeignKey('user.id'))
+)
+
 class Route(db.Model):
     __tablename__ = 'route'
     id = db.Column(db.Integer, primary_key=True)
@@ -42,6 +48,9 @@ class Route(db.Model):
     weather_id      = db.Column(db.Integer, db.ForeignKey('weather.id'), nullable=False)
     weather         = db.relationship('Weather')
 
+    
+    likes           = db.relationship("User", secondary=route_likes)
+    
     def __str__(self):
         return self.name
 

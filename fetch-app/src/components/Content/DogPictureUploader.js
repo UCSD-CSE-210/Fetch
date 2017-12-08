@@ -1,7 +1,7 @@
 import React from 'react';
-import './WildLifeUploader.css'
+import './DogPictureUploader.css'
 
-class WildLifeUploader extends React.Component {
+class DogPictureUploader extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -41,11 +41,10 @@ class WildLifeUploader extends React.Component {
 	_sendPhotoToServer(event) {
 		event.preventDefault();
 		var formData = new FormData();
-		//formData.append('wildlife_id', this.props.trail_id);
+		formData.append('route_id', this.props.trail_id);
 		formData.append('image', this.state.file);
-		// tested upload_route_image;
-		// fetch('http://127.0.0.1:5000/api/upload_wildlife_image', 
-		// 	  {method: 'POST', body: formData});
+		fetch('http://127.0.0.1:5000/api/upload_route_image', 
+			   {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
 	}
 
@@ -60,7 +59,7 @@ class WildLifeUploader extends React.Component {
 			<div className="modal-dialog">	
 				<div className="modal-content">
 					<div className="modal-header">
-						<h4 className="modal-title">Upload Picture of Wildlife</h4>
+						<h4 className="modal-title">Capture Picture of Dog</h4>
 						<button type="button" 
 								className="close"
                             	onClick={this.props.closeModal}>
@@ -96,4 +95,4 @@ class WildLifeUploader extends React.Component {
 	}
 }
 
-export default WildLifeUploader;
+export default DogPictureUploader;

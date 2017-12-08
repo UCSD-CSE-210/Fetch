@@ -5,10 +5,11 @@ from flask import url_for
 from flask_restful import reqparse, abort, Api, Resource, inputs, fields, marshal_with
 from geoalchemy2.shape import to_shape, from_shape
 from shapely.geometry import Point
-from sqlalchemy import func, asc
+from flask_security import current_user
 
 from managers.wildlife_manager import WildlifeTypeManager, WildlifeManager
-from managers.weather_manager import WeatherManager
+from managers.weather_manager  import WeatherManager
+from managers.route_manager    import RouteManager
 
 import json
 import copy
@@ -20,6 +21,7 @@ api = utils.get_api()
 db = utils.get_db()
 
 # Managers
+route_manager = RouteManager(db)
 wildlifetype_manager = WildlifeTypeManager(db)
 wildlife_manager = WildlifeManager(db)
 weather_manager = WeatherManager(db)
@@ -60,12 +62,14 @@ wildlife_parser.add_argument('route', type=int, store_missing=False)
 
 # GET parameters for weather
 weather_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
-weather_parser.add_argument('address', type=str, store_missing=False)
 weather_parser.add_argument('temperature', type=int, store_missing=False)
 weather_parser.add_argument('sunny', type=inputs.boolean, store_missing=False)
 weather_parser.add_argument('cloudy', type=inputs.boolean, store_missing=False)
 weather_parser.add_argument('rainy', type=inputs.boolean, store_missing=False)
-weather_parser.add_argument('timestamp', type=int, store_missing=False)
+
+# POST parameters for route liking
+route_like_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
+route_like_parser.add_argument('route_id', type=int, required=True)
 
 class Coordinates(fields.Raw):
     def format(self, wkb):
@@ -84,8 +88,8 @@ class LocationField(fields.Raw):
     def format(self, loc):
         point = to_shape(loc).coords[:]
         return {
-            'latitude'  : point[0][0],
-            'longitude' : point[0][1]
+            'latitude'  : point[0][1],
+            'longitude' : point[0][0]
         }
 
 class RouteField(fields.Raw):
@@ -129,7 +133,9 @@ route_fields = {
     'images'          : ImageField(attribute='images'),
     'surface'         : fields.String,
     'distance'        : fields.Float,
-    'weather'         : WeatherField
+    'weather'         : WeatherField,
+    'like_count'      : fields.Integer(attribute=lambda r: len(r.likes)),
+    'can_like'        : fields.Boolean(attribute=lambda r: current_user.has_role('user') and current_user not in r.likes)
 }
 
 wildlife_type_fields = {
@@ -188,78 +194,14 @@ class RouteResource(Resource):
     @marshal_with(route_fields, envelope='results')
     def get(self):
         args = search_parser.parse_args(strict=True)
+        return route_manager.search(args)
 
-        if 'id' in args:
-            route = Route.query.get(args['id'])
-            return [route] if route is not None else []
+class RouteLikeResource(Resource):    
+    @marshal_with(route_fields, envelope='results')
+    def post(self):
+        args = route_like_parser.parse_args(strict=True)
+        return route_manager.like(args)
 
-        q = Route.query
-        
-        # ######################################################################
-        # filter only if the following features are wanted
-        # (i.e. ignores if they are not wanted)
-        # ######################################################################
-        feature_flags = ['is_shade', 'is_water', 'is_garbage_can', 'has_parking_lot', 'is_poop_bag']
-        
-        for f in feature_flags:
-            if f in args and args[f]:
-                q = q.filter_by(**{f : True})
-        # ######################################################################
-        # handle parameters that require special care
-        # ######################################################################
-        filters = [('name',         self.filter_name),
-                   ('address',      self.filter_address),
-                   ('surface',      self.filter_surface),
-                   ('min_distance', self.filter_min_distance),
-                   ('max_distance', self.filter_max_distance)]
-                   
-        for (arg,call) in filters:
-            q = self.update_filter(q, args, arg, call)
-        # ######################################################################
-        # handle geographical filters
-        # ######################################################################
-        latitude  = args['latitude']
-        longitude = args['longitude']
-        
-        if latitude is not None and longitude is not None :
-            sql_point = self.latlong_to_sql({'latitude'  : latitude,
-                                             'longitude' : longitude})
-            
-            q = q.order_by(func.ST_Distance(Route.path, sql_point).asc())
-            
-            if 'radius' in args:
-                radius = args['radius']
-                q = q.filter(func.ST_Distance(Route.path, sql_point) <= 1609.34 * radius)
-        # ######################################################################
-
-        results = q.all()
-        return results
-    
-    def update_filter(self, q, args, arg_name, call):
-        if arg_name in args:
-            arg = args[arg_name]
-            return call(q, arg)
-        else:
-            return q
-    
-    def filter_name(self, q, name):
-        return q.filter(Route.name.ilike('%'+name+'%'))
-    
-    def filter_address(self, q, address):
-        return q.filter(Route.address.ilike('%'+address+'%'))
-    
-    def filter_surface(self, q, surface):
-        return q.filter(Route.surface.has(name=surface))
-    
-    def filter_min_distance(self, q, min_distance):
-        return q.filter(Route.distance >= min_distance)
-
-    def filter_max_distance(self, q, max_distance):
-        return q.filter(Route.distance <= max_distance)
-
-    def latlong_to_sql(self, coord):
-        t = 'SRID=%d;POINT(%.6f %.6f)' % (utils.get_default_srid(), coord['longitude'], coord['latitude'])
-        return func.ST_GeogFromText(t)
         
 class WildlifeTypeResource(Resource):
     '''
@@ -317,13 +259,26 @@ class WildlifeResource(Resource):
 
 class WeatherResource(Resource):
     '''
-
+    Query parameters:
+    1. temperature - optional int
+    2. cloudy - optional boolean
+    3. rainy - optional boolean
+    4. sunny - optional boolean
     '''
     @marshal_with(weather_fields, envelope='results')
     def get(self):
         args = weather_parser.parse_args(strict=True)
         return weather_manager.select(args)
     
+    '''
+    JSON payload example
+    {
+        "temperature": 95,
+        "cloudy": false,
+        "rainy": false,
+        "sunny": true
+    }
+    '''
     @marshal_with(weather_fields, envelope='results')
     def post(self):
         args = weather_parser.parse_args(strict=True)
@@ -335,6 +290,7 @@ class WeatherResource(Resource):
 
 # Add the resources to the app
 api.add_resource(RouteResource, '/api/route')
+api.add_resource(RouteLikeResource, '/api/route_like')
 api.add_resource(WildlifeTypeResource, '/api/wildlifetype')
 api.add_resource(WildlifeResource, '/api/wildlife')
 api.add_resource(WeatherResource, '/api/weather')

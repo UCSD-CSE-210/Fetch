@@ -1,11 +1,19 @@
 import React from 'react';
 import "./SearchBar.css";
 import CheckBox from './CheckBox.js';
+import Surfacebox from './Surfacebox.js';
+
 
 const items = [
     'Is shaded?',
     'Has garbage can?',
     'Show wildlife?',
+]
+
+const surfaceItems = [
+    'trail',
+    'road',
+    'all',
 ]
 
 class SearchBar extends React.Component {
@@ -18,6 +26,8 @@ class SearchBar extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.selectedCheckBoxes = new Set();
         this.toggleCheckBox = this.toggleCheckBox.bind(this);
+        this.surface = 'all';
+        this.toggleSurfacebox = this.toggleSurfacebox.bind(this);
     }
 
     updateText(event) {
@@ -40,6 +50,10 @@ class SearchBar extends React.Component {
         if (this.selectedCheckBoxes.has('Has garbage can?')) {
             params['is_garbage_can'] = true;
         }
+        if (this.surface && this.surface !== 'all') {
+            params['surface'] = this.surface;
+        }
+
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
@@ -47,6 +61,7 @@ class SearchBar extends React.Component {
         var shouldShow = {
             wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
         }
+        console.log(query);
         fetch('http://127.0.0.1:5000/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
@@ -60,11 +75,23 @@ class SearchBar extends React.Component {
         }
     }
 
+    toggleSurfacebox(label) {
+        this.surface = label;
+    }
+
     render() {
         var checkboxes = items.map(
             label => <CheckBox
                         label = {label}
                         callback = {this.toggleCheckBox}
+                        key = {label}
+                     />
+        );
+
+        var surfaceboxes = surfaceItems.map(
+            label => <Surfacebox
+                        label = {label}
+                        callback = {this.toggleSurfacebox}
                         key = {label}
                      />
         );
@@ -87,6 +114,10 @@ class SearchBar extends React.Component {
                 </div>
                 <div className='checkbox'>
                     {checkboxes}
+                </div>
+                <div className='surfacebox'>
+                    <p>Surface type</p>
+                    {surfaceboxes}
                 </div>
                 <div className='radiusbox'>
                     <label>Search radius</label>

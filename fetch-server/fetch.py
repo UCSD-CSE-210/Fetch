@@ -140,3 +140,7 @@ def upload_wildlife_image():
                                                  image_id='1')}})
     else:
         return render_template('upload_wildlife.html')
+
+@app.route('/api/route_like')
+def route_like_page():
+    return render_template('like.html')

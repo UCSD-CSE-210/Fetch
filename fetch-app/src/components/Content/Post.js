@@ -2,8 +2,9 @@ import React from 'react';
 import "./Post.css";
 import geoViewport from '@mapbox/geo-viewport'
 import WildLifeUploader from './WildLifeUploader'
+import DogPictureUploader from './DogPictureUploader'
 import Lightbox from 'react-image-lightbox';
-import Weatherbox from './Weatherbox.js'
+import Weatherbox from './Weatherbox';
 
 class Post extends React.Component {
 
@@ -17,9 +18,14 @@ class Post extends React.Component {
             photoIndex: 0,
             isOpen: false,
             images: [],
+            likeCount: this.props.value.like_count,
+            canLike: this.props.value.can_like,
+            likeAble: this.props.value.can_like,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
+        this._submitDogPicture= this._submitDogPicture.bind(this);
+        this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
     }
 
@@ -102,9 +108,46 @@ class Post extends React.Component {
                                 />});
     }
 
+    _submitDogPicture(event) {
+        event.preventDefault();
+        this.setState({modal: <DogPictureUploader 
+                                trail_id = {this.props.value.id}
+                                trail_name = {this.props.value.name}
+                                closeModal = {this.closeModal}
+                                />});
+    }
+
+    _like(event){
+        event.preventDefault();
+        var thumbsUp = document.getElementById("like_id" + this.props.value.id);
+
+        if (!this.state.canLike) {
+            return;
+        }else if(this.state.likeAble){
+            this.setState({likeCount: this.state.likeCount + 1});
+            this.setState({likeAble: !this.state.likeAble});
+            console.log(thumbsUp);
+            thumbsUp.classList.add("liked");
+        }else if(!this.state.likeAble){
+            this.setState({likeCount: this.state.likeCount - 1});
+            this.setState({likeAble: !this.state.likeAble});
+            thumbsUp.classList.remove("liked");
+        }
+    }
+
     closeModal(event) {
         event.preventDefault();
         this.setState({modal: null});
+    }
+
+
+    _displayDistance(distance) {
+        if (!distance)
+            return "Unknown";
+        distance = Math.round(distance * 100)/100;
+        if (!distance)
+            distance = "< 0.005"
+        return distance + " miles";
     }
 
     render() {
@@ -116,9 +159,9 @@ class Post extends React.Component {
         var info = this.props.value;
         return (
             <div className="post-card container">
-                <div className="row">
-                    <h3 className="col-sm-9"><b>{info.name}</b></h3>
-                    <Weatherbox className="col-sm-3" />
+                <div className='row'>
+                    <h3 className='col-9'><b>{info.name}</b></h3>
+                    <Weatherbox className='col-3'/>
                 </div>
                 <div className="row">
                     <div className="col-sm-4">
@@ -128,6 +171,7 @@ class Post extends React.Component {
                                 Shade: {this._yesOrNo(info.is_shade)}<br/>
                                 Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
                                 Water: {this._yesOrNo(info.is_water)}<br/>
+                                distance: {this._displayDistance(info.distance)}
                                 {this.state.wildlifeInfo}
                             </p>
                         </div>
@@ -139,6 +183,7 @@ class Post extends React.Component {
                                 onClick={() => this.setState({isOpen: true})}
                             />
                         </div>
+                        
                         {isOpen &&
                             <Lightbox className="post-img"
                                 mainSrc={images[photoIndex]}
@@ -159,6 +204,14 @@ class Post extends React.Component {
                     <div className="col-sm-8">
                         <div className="post-img">
                             <img className='map img-responsive' alt="trail map" src={this.state.mapURL}/>
+                            <div className="like-box">
+                                {(this.state.canLike) &&
+                                    <span id={"like_id" + info.id} className="fa fa-thumbs-up fa-2x" onClick={this._like}></span>}
+                                {!(this.state.canLike) &&
+                                    <span className="fa fa-thumbs-up fa-2x unclickable"></span>
+                                }
+                                <p>{this.state.likeCount}</p>
+                            </div>
                         </div>
                         <div>
                             <label className="btn  btn-primary col-sm-12 post-btn">
@@ -172,8 +225,7 @@ class Post extends React.Component {
                                 Capture pictures of dogs
                                 <input
                                     style={{"display": "none"}}
-                                    type="file"
-                                    accept="image/*"
+                                    onClick={this._submitDogPicture}
                                 />
                             </label>
                         </div>

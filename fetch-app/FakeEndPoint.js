@@ -56,31 +56,39 @@ var g = {
             },
         };
 
-var fakeData = [
+var fakeData = {results: [
+    
     {
-        title : 'Trail',
+        name : 'Trail',
+        id: '1',
         date : 'November 1 2017',
         ratings : '4.8',
         geojson : g,
+        like_count: 20,
+        can_like: true,
         viewpoint : "-117.234104275703,32.8817946493596,13.67",
         imgs: 'https://dog.ceo/api/img/retriever-golden/n02099601_3007.jpg',
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     },
     {
-        title : 'Trail',
+        name : 'Trail',
+        id: '2',
         date : 'November 1 2017',
         ratings : '4.8',
         geojson : g,
+        like_count: 22,
+        can_like: true,
         viewpoint : "-117.234104275703,32.8817946493596,13.67",
         imgs: 'https://dog.ceo/api/img/retriever-golden/n02099601_3007.jpg',
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     }
 ]
+}
 
-app.get('/search', function(req, res){
+app.get('/api/route', function(req, res){
     console.log(req.query);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.send(JSON.stringify(fakeData));
 })
 
-app.listen(4000, () => console.log('Example app listening on port 4000!'))
+app.listen(5000, () => console.log('Example app listening on port 5000!'))
