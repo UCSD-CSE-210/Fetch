@@ -83,6 +83,13 @@ class WildLifeUploader extends React.Component {
                     	</div>
                     	{this.state.submitButton}
                     </div>
+                    <div className="modal-footer">
+                    	<button type="button" 
+                    			class="btn btn-default" 
+                    			onClick={this.props.closeModal}> 
+                    		Close 
+                    	</button>
+                    </div>
 				</div>
 			</div>
 		);

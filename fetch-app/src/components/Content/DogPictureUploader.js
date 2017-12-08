@@ -43,7 +43,6 @@ class DogPictureUploader extends React.Component {
 		var formData = new FormData();
 		formData.append('route_id', this.props.trail_id);
 		formData.append('image', this.state.file);
-		// tested upload_route_image;
 		fetch('http://127.0.0.1:5000/api/upload_route_image', 
 			   {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
@@ -82,6 +81,13 @@ class DogPictureUploader extends React.Component {
                     		{imagePreview}
                     	</div>
                     	{this.state.submitButton}
+                    </div>
+                    <div className="modal-footer">
+                    	<button type="button" 
+                    			class="btn btn-default" 
+                    			onClick={this.props.closeModal}> 
+                    		Close 
+                    	</button>
                     </div>
 				</div>
 			</div>
