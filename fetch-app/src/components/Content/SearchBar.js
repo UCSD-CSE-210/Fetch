@@ -29,6 +29,8 @@ class SearchBar extends React.Component {
         this.toggleCheckBox = this.toggleCheckBox.bind(this);
         this.surface = 'all';
         this.toggleSurfacebox = this.toggleSurfacebox.bind(this);
+        this._geoError = this._geoError.bind(this);
+        this._queryForm = this._queryForm.bind(this);
     }
 
     updateText(event) {
@@ -41,10 +43,40 @@ class SearchBar extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
+        if (this.state.radius && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this._queryForm, this._geoError);
+            return;
+        }
+        this._queryForm(null);
+    }
+
+    _geoError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                console.log("User denied the request for Geolocation.")
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("Location information is unavailable.")
+                break;
+            case error.TIMEOUT:
+                console.log("The request to get user location timed out.")
+                break;
+            default:
+                console.log("An unknown error occurred.")
+                break;
+        }
+        this._queryForm(null);
+    }
+
+    _queryForm(position) {
+
+        //cannot test geolocation on my virtual machine;
+        //will continue to test it on Chenyu's Side
+
         let params = {
             'address': this.state.text,
-            //'radius' : this.state.radius,
         }
+        
         if (this.selectedCheckBoxes.has('Is shaded?')) {
             params['is_shade'] = true; 
         }
@@ -57,9 +89,11 @@ class SearchBar extends React.Component {
         if (this.surface && this.surface !== 'all') {
             params['surface'] = this.surface;
         }
+
         var shouldShow = {
             wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
         }
+        
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))

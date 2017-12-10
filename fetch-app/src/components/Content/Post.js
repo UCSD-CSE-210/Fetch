@@ -156,7 +156,7 @@ class Post extends React.Component {
             <div className="post-card container">
                 <div className='row'>
                     <h3 className='col-9'><b>{info.name}</b></h3>
-                    <Weatherbox className='col-3' weather={info.weather}/>
+                    <Weatherbox className='col-3' weatherInfo={info.weather}/>
                 </div>
                 <div className="row">
                     <div className="col-sm-4">

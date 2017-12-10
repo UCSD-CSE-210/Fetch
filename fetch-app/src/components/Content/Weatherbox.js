@@ -10,21 +10,22 @@ class Weatherbox extends React.Component {
             sunny,
             cloudy,
             rainy,
-        } = props.weather;
-        this.state = {
-            temp : temperature, 
-            weather: '', 
-            icon: '',
-        };
+        } = props.weatherInfo;
+        let weather = ''
         if (sunny) {
-            this.state.weather = 'Sunny';
+            weather = 'Sunny';
         }
         if (cloudy) {
-            this.state.weather = 'Cloudy';
+            weather = 'Cloudy';
         }
         if (rainy) {
-            this.state.weather = 'Rainy';
+            weather = 'Rainy';
         }
+        this.state = {
+            temp : temperature, 
+            weather: weather, 
+            icon: '',
+        };
     }
     
     componentDidMount() {
