@@ -5,6 +5,7 @@ import WildLifeUploader from './WildLifeUploader'
 import DogPictureUploader from './DogPictureUploader'
 import Lightbox from 'react-image-lightbox';
 import Weatherbox from './Weatherbox';
+import Config from '../../Config'
 
 class Post extends React.Component {
 
@@ -13,7 +14,7 @@ class Post extends React.Component {
         var images = [];
         this.props.value.images.forEach(
             item => {
-                images.push('http://127.0.0.1:5000' + item.image_url);          
+                images.push(Config.backendServerURL + item.image_url);          
             }
         );
         this.state = {
@@ -26,6 +27,7 @@ class Post extends React.Component {
             likeCount: this.props.value.like_count,
             canLike: this.props.value.can_like,
             likeAble: this.props.value.can_like,
+            wildlifeWarning: null,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
@@ -36,6 +38,7 @@ class Post extends React.Component {
 
     componentDidMount() {
         this._renderMap();
+        this._renderWildlife();
     }
 
     _renderMap() {
@@ -69,8 +72,23 @@ class Post extends React.Component {
         var viewpoint = `${center.center[0]},${center.center[1]},${center.zoom - 1.5}`;
 
         //wildlife
+        this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
+            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
+            `${viewpoint}/500x300?` +
+            `access_token=${this.token}`});
+    }
+
+    _renderWildlife(){
+        var info = this.props.value;
+        console.log(this.props.shouldShow);
         if (this.props.shouldShow.wildlife) {
-            fetch(`http://localhost:5000/api/wildlife?route=${info.id}`)
+            this.setState(
+                {
+                    wildlifeWarning:
+                    <img className="img-responsive wildlife-icon" src={require("./wildlifeWarning.svg")} alt="wildlife warning sign"/>,
+                }
+            );
+            fetch(Config.backendServerURL + `/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
                     let wildlife = []
@@ -85,10 +103,6 @@ class Post extends React.Component {
                     }
                 });           
         }
-        this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
-            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
-            `${viewpoint}/500x300?` +
-            `access_token=${this.token}`});
     }
 
     _submitWildlife(event) {
@@ -155,7 +169,10 @@ class Post extends React.Component {
         return (
             <div className="post-card container">
                 <div className='row'>
-                    <h3 className='col-8'><b>{info.name}</b></h3>
+                    <h3 className='col-5'><b>{info.name}</b></h3>
+                    <div className='col-3 wildlife-box'>
+                        {this.state.wildlifeWarning}
+                    </div>
                     <Weatherbox className='col-4' weatherInfo={info.weather}/>
                 </div>
                 <div className="row">

@@ -1,5 +1,6 @@
 import React from 'react';
 import './WildLifeUploader.css'
+import Config from '../../Config'
 
 class WildLifeUploader extends React.Component {
 
@@ -16,7 +17,7 @@ class WildLifeUploader extends React.Component {
 
 	componentDidMount() {
 		var wildlifetype = [];
-	    fetch('http://127.0.0.1:5000/api/wildlifetype?')
+	    fetch(Config.backendServerURL + '/api/wildlifetype?')
                 .then(data => data.json())
                 .then(data => {
                 	if (data.results) {

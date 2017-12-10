@@ -2,7 +2,7 @@ import React from 'react';
 import "./SearchBar.css";
 import CheckBox from './CheckBox.js';
 import Surfacebox from './Surfacebox.js';
-
+import Config from '../../Config'
 
 const items = [
     'Is shaded?',
@@ -13,7 +13,7 @@ const items = [
 
 const surfaceItems = [
     'trail',
-    'road',
+    'urban',
     'all',
 ]
 
@@ -72,7 +72,7 @@ class SearchBar extends React.Component {
 
         //cannot test geolocation on my virtual machine;
         //will continue to test it on Chenyu's Side
-
+        console.log(position);
         let params = {
             'address': this.state.text,
         }
@@ -98,7 +98,7 @@ class SearchBar extends React.Component {
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-        fetch('http://127.0.0.1:5000/api/route?' + query)
+        fetch(Config.backendServerURL + '/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
     }
