@@ -68,6 +68,13 @@ var fakeData = {results: [
         can_like: true,
         viewpoint : "-117.234104275703,32.8817946493596,13.67",
         imgs: 'https://dog.ceo/api/img/retriever-golden/n02099601_3007.jpg',
+        images: [],
+        weather: {
+            temperature: 78,
+            sunny: true,
+            cloudy: false,
+            rainy: false,
+        },
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     },
     {
@@ -80,6 +87,13 @@ var fakeData = {results: [
         can_like: true,
         viewpoint : "-117.234104275703,32.8817946493596,13.67",
         imgs: 'https://dog.ceo/api/img/retriever-golden/n02099601_3007.jpg',
+        images: [],
+        weather: {
+            temperature: 78,
+            sunny: true,
+            cloudy: false,
+            rainy: false,
+        },
         description : 'this is just some random description of a trail this is just some random description of a trail this is just some random description of a trail'
     }
 ]

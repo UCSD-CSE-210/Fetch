@@ -25,6 +25,7 @@ class Weatherbox extends React.Component {
             temp : temperature, 
             weather: weather, 
             icon: '',
+            shouldWarn: false,
         };
     }
     
@@ -32,6 +33,9 @@ class Weatherbox extends React.Component {
         switch (this.state.weather){
             case 'Sunny':
                 this.setState({icon: require('./weather/sunny.svg')});
+                if (this.state.temp > 75) {
+                    this.setState({shouldWarn: true});
+                }
                 break;
             case 'Cloudy':
                 this.setState({icon: require('./weather/cloudy.svg')});
@@ -53,6 +57,9 @@ class Weatherbox extends React.Component {
     render() {
         return (
             <div className="row weather">
+                {this.state.shouldWarn &&
+                    <img className="img-responsive weather-icon" src={require("./weather/warning.svg")} alt="weather icon"/>
+                }
                 <img className="img-responsive weather-icon" src={this.state.icon} alt="weather icon"/>
                 <div>                
                     <div>{this.state.weather}</div>
