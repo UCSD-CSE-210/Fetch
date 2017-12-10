@@ -1,7 +1,9 @@
 class Config{
 
 	constructor() {
-		this.backendServerURL = 'http://andrysco2.ucsd.edu:5000';
+		this.backendServerURL = 'https://andrysco2.ucsd.edu:5000';
+		// this.backendServerURL = 'http://localhost:5000';
+
 	}
 
 }

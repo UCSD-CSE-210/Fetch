@@ -37,7 +37,8 @@ class Post extends React.Component {
     }
 
     componentDidMount() {
-        this._renderMap();
+        // this._renderMap();
+        this._renderWildlife();
     }
 
     _renderMap() {
@@ -71,6 +72,15 @@ class Post extends React.Component {
         var viewpoint = `${center.center[0]},${center.center[1]},${center.zoom - 1.5}`;
 
         //wildlife
+        this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
+            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
+            `${viewpoint}/500x300?` +
+            `access_token=${this.token}`});
+    }
+
+    _renderWildlife(){
+        var info = this.props.value;
+        console.log(this.props.shouldShow);
         if (this.props.shouldShow.wildlife) {
             this.setState(
                 {
@@ -93,10 +103,6 @@ class Post extends React.Component {
                     }
                 });           
         }
-        this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
-            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
-            `${viewpoint}/500x300?` +
-            `access_token=${this.token}`});
     }
 
     _submitWildlife(event) {
@@ -163,8 +169,8 @@ class Post extends React.Component {
         return (
             <div className="post-card container">
                 <div className='row'>
-                    <h3 className='col-6'><b>{info.name}</b></h3>
-                    <div className='col-2'>
+                    <h3 className='col-5'><b>{info.name}</b></h3>
+                    <div className='col-3 wildlife-box'>
                         {this.state.wildlifeWarning}
                     </div>
                     <Weatherbox className='col-4' weatherInfo={info.weather}/>
