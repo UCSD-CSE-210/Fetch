@@ -5,6 +5,7 @@ import WildLifeUploader from './WildLifeUploader'
 import DogPictureUploader from './DogPictureUploader'
 import Lightbox from 'react-image-lightbox';
 import Weatherbox from './Weatherbox';
+import Config from '../../Config'
 
 class Post extends React.Component {
 
@@ -13,7 +14,7 @@ class Post extends React.Component {
         var images = [];
         this.props.value.images.forEach(
             item => {
-                images.push('http://andrysco2.ucsd.edu:5000' + item.image_url);          
+                images.push(Config.backendServerURL + item.image_url);          
             }
         );
         this.state = {
@@ -26,6 +27,7 @@ class Post extends React.Component {
             likeCount: this.props.value.like_count,
             canLike: this.props.value.can_like,
             likeAble: this.props.value.can_like,
+            wildlifeWarning: null,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
@@ -70,7 +72,13 @@ class Post extends React.Component {
 
         //wildlife
         if (this.props.shouldShow.wildlife) {
-            fetch(`http://andrysco2.ucsd.edu:5000/api/wildlife?route=${info.id}`)
+            this.setState(
+                {
+                    wildlifeWarning:
+                    <img className="img-responsive wildlife-icon" src={require("./wildlifeWarning.svg")} alt="wildlife warning sign"/>,
+                }
+            );
+            fetch(Config.backendServerURL + `/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
                     let wildlife = []
@@ -155,7 +163,10 @@ class Post extends React.Component {
         return (
             <div className="post-card container">
                 <div className='row'>
-                    <h3 className='col-8'><b>{info.name}</b></h3>
+                    <h3 className='col-6'><b>{info.name}</b></h3>
+                    <div className='col-2'>
+                        {this.state.wildlifeWarning}
+                    </div>
                     <Weatherbox className='col-4' weatherInfo={info.weather}/>
                 </div>
                 <div className="row">

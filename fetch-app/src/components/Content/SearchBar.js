@@ -2,7 +2,7 @@ import React from 'react';
 import "./SearchBar.css";
 import CheckBox from './CheckBox.js';
 import Surfacebox from './Surfacebox.js';
-
+import Config from '../../Config'
 
 const items = [
     'Is shaded?',
@@ -98,7 +98,7 @@ class SearchBar extends React.Component {
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-        fetch('http://andrysco2.ucsd.edu:5000/api/route?' + query)
+        fetch(Config.backendServerURL + '/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
     }

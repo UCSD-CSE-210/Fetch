@@ -1,5 +1,6 @@
 import React from 'react';
 import './DogPictureUploader.css'
+import Config from '../../Config'
 
 class DogPictureUploader extends React.Component {
 
@@ -43,7 +44,7 @@ class DogPictureUploader extends React.Component {
 		var formData = new FormData();
 		formData.append('route_id', this.props.trail_id);
 		formData.append('image', this.state.file);
-		fetch('http://andrysco2.ucsd.edu:5000/api/upload_route_image', 
+		fetch(Config.backendServerURL + '/api/upload_route_image', 
 			   {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
 	}
