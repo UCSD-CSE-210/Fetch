@@ -14,6 +14,22 @@ class WildLifeUploader extends React.Component {
 		this._sendPhotoToServer = this._sendPhotoToServer.bind(this);
 	}
 
+	componentDidMount() {
+		var wildlifetype = [];
+	    fetch('http://127.0.0.1:5000/api/wildlifetype?')
+                .then(data => data.json())
+                .then(data => {
+                	if (data.results) {
+                		data.results.forEach(
+                			item => {
+                				wildlifetype.push([item.name, item.id]);
+                			}
+                		);
+                	}
+                	console.log(wildlifetype);
+                });
+    }
+
 	_uploadPhoto(event) {
 		event.preventDefault();
 		
@@ -85,7 +101,7 @@ class WildLifeUploader extends React.Component {
                     </div>
                     <div className="modal-footer">
                     	<button type="button" 
-                    			class="btn btn-default" 
+                    			className="btn btn-default" 
                     			onClick={this.props.closeModal}> 
                     		Close 
                     	</button>

@@ -10,14 +10,19 @@ class Post extends React.Component {
 
     constructor(props) {
         super(props);
+        var images = [];
+        this.props.value.images.forEach(
+            item => {
+                images.push('http://127.0.0.1:5000' + item.image_url);          
+            }
+        );
         this.state = {
-            imgs : "http://placehold.it/400x20undefined1",
             mapURL : "http://placehold.it/400x20undefined1",
             wildlifeInfo : "",
             modal : null,
             photoIndex: 0,
             isOpen: false,
-            images: [],
+            images: images,
             likeCount: this.props.value.like_count,
             canLike: this.props.value.can_like,
             likeAble: this.props.value.can_like,
@@ -27,6 +32,10 @@ class Post extends React.Component {
         this._submitDogPicture= this._submitDogPicture.bind(this);
         this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
+    }
+
+    componentDidMount() {
+        this._renderMap();
     }
 
     _renderMap() {
@@ -71,9 +80,7 @@ class Post extends React.Component {
                         }
                     );
                     if (data.results && data.results.length > 0) {
-                        this.setState({wildlifeInfo:  <div> Wildlife: <br/>
-                                                          {wildlife}
-                                                      </div>
+                        this.setState({wildlifeInfo:  <div> Wildlife: {wildlife} </div>
                                                 });
                     }
                 });           
@@ -82,21 +89,6 @@ class Post extends React.Component {
             'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
             `${viewpoint}/500x300?` +
             `access_token=${this.token}`});
-    }
-
-    componentDidMount() {
-        fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
-            .then(data => data.json())
-            .then(data => {
-                this.setState({imgs: data.message,
-                               images: this.state.images.concat([data.message])});
-                console.log(this.state.images);
-            });
-        this._renderMap();
-    }
-
-    _yesOrNo(boolValue) {
-        return (boolValue)? 'Yes' : 'No';
     }
 
     _submitWildlife(event) {
@@ -117,6 +109,11 @@ class Post extends React.Component {
                                 />});
     }
 
+    closeModal(event) {
+        event.preventDefault();
+        this.setState({modal: null});
+    }
+
     _like(event){
         event.preventDefault();
         var thumbsUp = document.getElementById("like_id" + this.props.value.id);
@@ -135,11 +132,9 @@ class Post extends React.Component {
         }
     }
 
-    closeModal(event) {
-        event.preventDefault();
-        this.setState({modal: null});
+    _yesOrNo(boolValue) {
+        return (boolValue)? 'Yes' : 'No';
     }
-
 
     _displayDistance(distance) {
         if (!distance)
@@ -170,8 +165,10 @@ class Post extends React.Component {
                                 Address: {info.address}<br/>
                                 Shade: {this._yesOrNo(info.is_shade)}<br/>
                                 Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
+                                Parking lot: {this._yesOrNo(info.has_parking_lot)}<br/>
                                 Water: {this._yesOrNo(info.is_water)}<br/>
-                                distance: {this._displayDistance(info.distance)}
+                                Distance: {this._displayDistance(info.distance)}<br/>
+                                Surface: {info.surface}<br/>
                                 {this.state.wildlifeInfo}
                             </p>
                         </div>

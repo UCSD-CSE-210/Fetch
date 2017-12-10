@@ -7,6 +7,7 @@ import Surfacebox from './Surfacebox.js';
 const items = [
     'Is shaded?',
     'Has garbage can?',
+    'Has parking lot?',
     'Show wildlife?',
 ]
 
@@ -50,18 +51,19 @@ class SearchBar extends React.Component {
         if (this.selectedCheckBoxes.has('Has garbage can?')) {
             params['is_garbage_can'] = true;
         }
+        if (this.selectedCheckBoxes.has('Has parking lot?')) {
+            params['has_parking_lot'] = true;
+        }
         if (this.surface && this.surface !== 'all') {
             params['surface'] = this.surface;
         }
-
+        var shouldShow = {
+            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
+        }
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-        var shouldShow = {
-            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
-        }
-        console.log(query);
         fetch('http://127.0.0.1:5000/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
