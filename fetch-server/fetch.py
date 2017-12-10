@@ -49,10 +49,16 @@ configure_uploads(app, wildlife_images)
 def index():
     if current_user.is_authenticated:
          return redirect(url_for('admin.index'))
-         return render_template("admin/index.html")
     else:
          return render_template('index.html')
 
+@app.route('/login')
+@login_required
+def login():
+    if current_user.is_authenticated:
+         return redirect(url_for('admin.index'))
+    else:
+         return render_template('index.html')
 '''
 Returns the image with the given identifier
 '''
