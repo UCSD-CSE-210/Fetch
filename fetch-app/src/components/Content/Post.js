@@ -37,7 +37,7 @@ class Post extends React.Component {
     }
 
     componentDidMount() {
-        // this._renderMap();
+        this._renderMap();
         this._renderWildlife();
     }
 
