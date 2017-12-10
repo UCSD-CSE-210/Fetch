@@ -13,7 +13,7 @@ class Post extends React.Component {
         var images = [];
         this.props.value.images.forEach(
             item => {
-                images.push('http://127.0.0.1:5000' + item.image_url);          
+                images.push('http://andrysco2.ucsd.edu:5000' + item.image_url);          
             }
         );
         this.state = {
@@ -70,7 +70,7 @@ class Post extends React.Component {
 
         //wildlife
         if (this.props.shouldShow.wildlife) {
-            fetch(`http://localhost:5000/api/wildlife?route=${info.id}`)
+            fetch(`http://andrysco2.ucsd.edu:5000/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
                     let wildlife = []

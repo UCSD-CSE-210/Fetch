@@ -72,7 +72,7 @@ class SearchBar extends React.Component {
 
         //cannot test geolocation on my virtual machine;
         //will continue to test it on Chenyu's Side
-
+        console.log(position);
         let params = {
             'address': this.state.text,
         }
@@ -98,7 +98,7 @@ class SearchBar extends React.Component {
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-        fetch('http://127.0.0.1:5000/api/route?' + query)
+        fetch('http://andrysco2.ucsd.edu:5000/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
     }

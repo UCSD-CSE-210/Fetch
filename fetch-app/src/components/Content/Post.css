@@ -46,6 +46,10 @@ h3{
   margin-bottom: 10px;
 }
 
+.post-btn:hover{
+
+}
+
 .inactive {
   color: gray;
 }
@@ -61,7 +65,7 @@ h3{
 }
 
 .liked {
-  color: red;
+  color: #303F9F;
 }
 
 .unclickable{
