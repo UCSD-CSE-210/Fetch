@@ -13,7 +13,7 @@ const items = [
 
 const surfaceItems = [
     'trail',
-    'road',
+    'urban',
     'all',
 ]
 
