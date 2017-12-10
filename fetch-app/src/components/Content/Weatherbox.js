@@ -26,7 +26,9 @@ class Weatherbox extends React.Component {
             weather: weather, 
             icon: '',
             shouldWarn: false,
+            alertMsg: "",
         };
+        this._showAlert= this._showAlert.bind(this);
     }
     
     componentDidMount() {
@@ -35,6 +37,7 @@ class Weatherbox extends React.Component {
                 this.setState({icon: require('./weather/sunny.svg')});
                 if (this.state.temp > 75) {
                     this.setState({shouldWarn: true});
+                    this.setState({alertMsg: "It might be too hot for your dog!"});
                 }
                 break;
             case 'Cloudy':
@@ -45,6 +48,8 @@ class Weatherbox extends React.Component {
                 break;
             case 'Rainy':
                 this.setState({icon: require('./weather/rainy.svg')});
+                this.setState({shouldWarn: true});
+                this.setState({alertMsg: "It's raining on this route now, you may want to reconsider!"});
                 break;
             case 'Windy':
                 this.setState({icon: require('./weather/windy.svg')});
@@ -54,11 +59,16 @@ class Weatherbox extends React.Component {
         }
     }
 
+    _showAlert(event){
+        event.preventDefault();
+        alert(this.state.alertMsg);
+    }
+
     render() {
         return (
             <div className="row weather">
                 {this.state.shouldWarn &&
-                    <img className="img-responsive weather-icon" src={require("./weather/warning.svg")} alt="weather icon"/>
+                    <img className="img-responsive weather-icon" src={require("./weather/warning.svg")} onClick={this._showAlert} alt="weather icon"/>
                 }
                 <img className="img-responsive weather-icon" src={this.state.icon} alt="weather icon"/>
                 <div>                
