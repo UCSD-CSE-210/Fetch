@@ -28,12 +28,16 @@ class Post extends React.Component {
             canLike: this.props.value.can_like,
             likeAble: this.props.value.can_like,
             wildlifeWarning: null,
+            showWildlifeImages: false,
+            wildlifeImages: [],
+            wildlifePhotoIndex: 0,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
         this._submitDogPicture= this._submitDogPicture.bind(this);
         this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this._renderWildlife = this._renderWildlife.bind(this);
     }
 
     componentDidMount() {
@@ -80,26 +84,35 @@ class Post extends React.Component {
 
     _renderWildlife(){
         var info = this.props.value;
-        console.log(this.props.shouldShow);
         if (this.props.shouldShow.wildlife) {
-            this.setState(
-                {
-                    wildlifeWarning:
-                    <img className="img-responsive wildlife-icon" src={require("./wildlifeWarning.svg")} alt="wildlife warning sign"/>,
-                }
-            );
             fetch(Config.backendServerURL + `/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
-                    let wildlife = []
+                    let wildlife = [];
+                    let wildlifeImages = [];
                     data.results.forEach(
                         (item, index) => {
                             wildlife.push(<div> {item.wildlifetype.name} <br/> </div>);
+                            wildlifeImages.push(Config.backendServerURL + item.images[0].image_url);
                         }
                     );
+                    
                     if (data.results && data.results.length > 0) {
-                        this.setState({wildlifeInfo:  <div> Wildlife: {wildlife} </div>
-                                                });
+                        this.setState(
+                            {
+                                wildlifeWarning:
+                                <div>
+                                    <img className="img-responsive wildlife-icon" 
+                                         src={require("./wildlifeWarning.svg")} 
+                                         alt="wildlife warning sign"
+                                         onClick={() => {
+                                            this.setState({showWildlifeImages: true})
+                                        }}/>
+                                </div>
+                            }
+                        );
+                        this.setState({wildlifeImages: wildlifeImages});
+                        this.setState({wildlifeInfo:  <div> Wildlife: {wildlife} </div>});
                     }
                 });           
         }
@@ -210,6 +223,22 @@ class Post extends React.Component {
                                 })}
                                 onMoveNextRequest={() => this.setState({
                                     photoIndex: (photoIndex + 1) % images.length,
+                                })}
+                            />
+                        }
+                        {this.state.showWildlifeImages &&
+                            <Lightbox className="post-img"
+                                mainSrc={this.state.wildlifeImages[this.state.wildlifePhotoIndex]}
+                                nextSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + 1) % this.state.wildlifeImages.length]}
+                                prevSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1) 
+                                                                    % this.state.wildlifeImages.length]}
+         
+                                onCloseRequest={() => this.setState({ showWildlifeImages: false })}
+                                onMovePrevRequest={() => this.setState({
+                                    wildlifePhotoIndex: (this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1) % this.state.wildlifeImages.length,
+                                })}
+                                onMoveNextRequest={() => this.setState({
+                                    wildlifePhotoIndex: (this.state.wildlifePhotoIndex + 1) % this.state.wildlifeImages.length,
                                 })}
                             />
                         }
