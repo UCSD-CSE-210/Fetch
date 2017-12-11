@@ -105,7 +105,10 @@ class SearchBar extends React.Component {
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-        fetch(Config.backendServerURL + '/api/route?' + query)
+        fetch(Config.backendServerURL + '/api/route?' + query,
+                {
+                    credentials: "same-origin"
+                })
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
     }

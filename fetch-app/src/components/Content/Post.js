@@ -151,7 +151,11 @@ class Post extends React.Component {
             this.setState({likeCount: this.state.likeCount + 1});
             this.setState({likeAble: !this.state.likeAble});
             console.log(thumbsUp);
-            fetch(Config.backendServerURL + `/api/route_like?route_id=${this.props.value.id}`);
+            fetch(Config.backendServerURL + `/api/route_like?route_id=${this.props.value.id}`, 
+                {
+                    credentials: "same-origin"
+                }
+            );
             thumbsUp.classList.add("liked");
         }else if(!this.state.likeAble){
             this.setState({likeCount: this.state.likeCount - 1});
