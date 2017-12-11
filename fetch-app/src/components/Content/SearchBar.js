@@ -72,7 +72,6 @@ class SearchBar extends React.Component {
 
         //cannot test geolocation on my virtual machine;
         //will continue to test it on Chenyu's Side
-        console.log(position);
         let params = {
             'address': this.state.text,
         }
@@ -89,7 +88,15 @@ class SearchBar extends React.Component {
         if (this.surface && this.surface !== 'all') {
             params['surface'] = this.surface;
         }
-
+        if (position) {
+            params['longitude'] = position.coords.longitude;
+            params['latitude'] = position.coords.latitude;
+            params['radius'] = this.state.radius;
+            console.log('show radius of ' + 
+                this.state.radius + ' from ' + 
+                position.coords.longitude + 
+                ',' + position.coords.latitude);
+        }
         var shouldShow = {
             wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
         }
