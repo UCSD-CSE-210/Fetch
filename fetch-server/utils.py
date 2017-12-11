@@ -32,5 +32,5 @@ def get_zipcodes():
     with open(op.join(op.dirname(op.realpath(__file__)), 'zipcodes.csv')) as data_file:    
         csvreader = csv.reader(data_file, delimiter=',')
         for row in csvreader:
-            zipcodes[row[0]] = {"latitude": row[1], "longitude": row[2]}
+            zipcodes[row[0]] = {"latitude": float(row[1]), "longitude": float(row[2])}
         return zipcodes
