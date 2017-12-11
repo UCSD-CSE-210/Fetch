@@ -17,15 +17,15 @@ class DogPictureUploader extends React.Component {
 
 	_uploadPhoto(event) {
 		event.preventDefault();
-		
+
 		let reader = new FileReader();
 		let file = event.target.files[0];
-		
+
 		reader.onload = () => {
 			this.setState({
 				file: file,
 				imagePreviewUrl: reader.result,
-				submitButton: 
+				submitButton:
 					<label className="btn  btn-primary col-sm-12 post-btn">
                     	Upload
                         <input
@@ -44,7 +44,7 @@ class DogPictureUploader extends React.Component {
 		var formData = new FormData();
 		formData.append('route_id', this.props.trail_id);
 		formData.append('image', this.state.file);
-		fetch(Config.backendServerURL + '/api/upload_route_image', 
+		fetch(Config.backendServerURL + '/api/upload_route_image',
 			   {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
 	}
@@ -57,11 +57,11 @@ class DogPictureUploader extends React.Component {
 			imagePreview = <img className="preview-img" src={imagePreviewUrl} alt=""/>;
 		}
 		return (
-			<div className="modal-dialog">	
+			<div className="modal-dialog">
 				<div className="modal-content">
 					<div className="modal-header">
 						<h4 className="modal-title">Capture Picture of Dog</h4>
-						<button type="button" 
+						<button type="button"
 								className="close"
                             	onClick={this.props.closeModal}>
                         	&times;
@@ -84,10 +84,10 @@ class DogPictureUploader extends React.Component {
                     	{this.state.submitButton}
                     </div>
                     <div className="modal-footer">
-                    	<button type="button" 
-                    			class="btn btn-default" 
-                    			onClick={this.props.closeModal}> 
-                    		Close 
+                    	<button type="button"
+                    			className="btn btn-default" 
+                    			onClick={this.props.closeModal}>
+                    		Close
                     	</button>
                     </div>
 				</div>

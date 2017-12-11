@@ -17,10 +17,10 @@ class RouteManager():
                               'has_parking_lot', 
                               'is_poop_bag']
         self.filters = [('name',         self.filter_name),
-                        ('address',      self.filter_address),
                         ('surface',      self.filter_surface),
                         ('min_distance', self.filter_min_distance),
                         ('max_distance', self.filter_max_distance)]
+        self.zipcodes = utils.get_zipcodes()
 
     def search(self, args):
         if 'id' in args:
@@ -46,11 +46,17 @@ class RouteManager():
         # ######################################################################
         latitude  = args['latitude']  if 'latitude'  in args else None
         longitude = args['longitude'] if 'longitude' in args else None
+        zipcode   = args['address']   if 'address'   in args else None
         
-        if latitude is not None and longitude is not None :
+        sql_point = None
+
+        if latitude is not None and longitude is not None:
             sql_point = self.latlong_to_sql({'latitude'  : latitude,
                                              'longitude' : longitude})
+        elif zipcode is not None and zipcode in self.zipcodes: 
+            sql_point = self.latlong_to_sql(self.zipcodes[zipcode])
             
+        if sql_point is not None:
             q = q.order_by(func.ST_Distance(Route.path, sql_point).asc())
             
             if 'radius' in args:
