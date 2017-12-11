@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from flask_cors import CORS
 import csv
+import os.path as op
 
 app = Flask(__name__)
 app.config.from_envvar('FLASK_CONFIG_FILE')
