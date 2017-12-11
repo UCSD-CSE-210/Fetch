@@ -139,7 +139,7 @@ class SearchBar extends React.Component {
                         <input
                             className="address-input"
                             type = "text"
-                            placeholder = " city or zip code ..."
+                            placeholder = " zip code ..."
                             value = {this.state.text}
                             onChange = {this.updateText}
                         />

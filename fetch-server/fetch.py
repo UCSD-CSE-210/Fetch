@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, request, jsonify, abort, url_for
+from flask import Flask, render_template, send_from_directory, request, jsonify, abort, url_for, redirect
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
@@ -8,6 +8,8 @@ from models.route import Route, RouteAdmin
 from models.user import User, Role, UserAdmin
 from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
 from models.weather import Weather, WeatherAdmin
+
+from flask_login import current_user
 
 import utils
 
@@ -45,8 +47,18 @@ configure_uploads(app, wildlife_images)
 # Flask-Security will display a login form if the user isn't already authenticated.
 @login_required
 def index():
-    return render_template('index.html')
+    if current_user.is_authenticated:
+         return redirect(url_for('admin.index'))
+    else:
+         return render_template('index.html')
 
+@app.route('/login')
+@login_required
+def login():
+    if current_user.is_authenticated:
+         return redirect(url_for('admin.index'))
+    else:
+         return render_template('index.html')
 '''
 Returns the image with the given identifier
 '''
