@@ -21,8 +21,15 @@ class SearchBar extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {text : '', radius: ''};
+        this.state = {
+                        text : '',
+                        radius: '',
+                        minDist: '',
+                        maxDist: ''
+                    };
         this.updatedRadius = this.updatedRadius.bind(this);
+        this.updatedMinDist = this.updatedMinDist.bind(this);
+        this.updatedMaxDist = this.updatedMaxDist.bind(this);
         this.updateText = this.updateText.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.selectedCheckBoxes = new Set();
@@ -39,6 +46,14 @@ class SearchBar extends React.Component {
 
     updatedRadius(event){
         this.setState({radius: event.target.value});
+    }
+
+    updatedMinDist(event){
+        this.setState({minDist: event.target.value});
+    }
+
+    updatedMaxDist(event){
+        this.setState({maxDist: event.target.value});
     }
 
     handleSubmit(event) {
@@ -75,9 +90,9 @@ class SearchBar extends React.Component {
         let params = {
             'address': this.state.text,
         }
-        
+
         if (this.selectedCheckBoxes.has('Is shaded?')) {
-            params['is_shade'] = true; 
+            params['is_shade'] = true;
         }
         if (this.selectedCheckBoxes.has('Has garbage can?')) {
             params['is_garbage_can'] = true;
@@ -92,15 +107,25 @@ class SearchBar extends React.Component {
             params['longitude'] = position.coords.longitude;
             params['latitude'] = position.coords.latitude;
             params['radius'] = this.state.radius;
-            console.log('show radius of ' + 
-                this.state.radius + ' from ' + 
-                position.coords.longitude + 
+            console.log('show radius of ' +
+                this.state.radius + ' from ' +
+                position.coords.longitude +
                 ',' + position.coords.latitude);
         }
+
+        if (this.state.minDist || this.state.maxDist) {
+            var minDist = parseFloat(this.state.minDist);
+            var maxDist = parseFloat(this.state.maxDist);
+            if (minDist)
+                params['min_distance'] = minDist;
+            if (maxDist)
+                params['max_distance'] = maxDist;
+        }
+
         var shouldShow = {
             wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
         }
-        
+
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
@@ -172,6 +197,23 @@ class SearchBar extends React.Component {
                             value = {this.state.radius}
                             onChange = {this.updatedRadius}
                         />
+                </div>
+                <div className='distance'>
+                    <label>Trail distance:</label>
+                    <div>
+                    <label>From:</label>
+                    <input type="text" className="distance-input"
+                            placeholder = "min (miles)"
+                            value = {this.state.minDist}
+                            onChange = {this.updatedMinDist}
+                        />
+                    <label>To:</label>
+                    <input type="text" className="distance-input"
+                            placeholder = "max (miles)"
+                            value = {this.state.maxDist}
+                            onChange = {this.updatedMaxDist}
+                        />
+                    </div>
                 </div>
             </div>
     );
