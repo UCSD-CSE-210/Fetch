@@ -1,6 +1,7 @@
 import React from 'react';
-import './WildLifeUploader.css'
-import Config from '../../Config'
+import './WildLifeUploader.css';
+import Config from '../../Config';
+import Surfacebox from './Surfacebox';
 
 class WildLifeUploader extends React.Component {
 
@@ -10,38 +11,52 @@ class WildLifeUploader extends React.Component {
 			file: null,
 			imagePreviewUrl: null,
 			submitButton: null,
+			wildlifeItems: [],
+			wildlifeId: {},
 		};
 		this._uploadPhoto = this._uploadPhoto.bind(this);
 		this._sendPhotoToServer = this._sendPhotoToServer.bind(this);
+		this.toggleSurfacebox = this.toggleSurfacebox.bind(this);
+		this.wildlifetype = '';
 	}
 
 	componentDidMount() {
-		var wildlifetype = [];
+		var wildlifeId = {};
+		var wildlifeItems = [];
+
 	    fetch(Config.backendServerURL + '/api/wildlifetype?')
                 .then(data => data.json())
                 .then(data => {
                 	if (data.results) {
                 		data.results.forEach(
                 			item => {
-                				wildlifetype.push([item.name, item.id]);
+                				wildlifeId[item.name] = item.id;
+								wildlifeItems.push(item.name);
                 			}
                 		);
+						this.setState({
+							wildlifeId: wildlifeId,
+							wildlifeItems: wildlifeItems,
+						});
                 	}
-                	console.log(wildlifetype);
                 });
+    }
+
+	toggleSurfacebox(label) {
+        this.wildlifetype = label;
     }
 
 	_uploadPhoto(event) {
 		event.preventDefault();
-		
+
 		let reader = new FileReader();
 		let file = event.target.files[0];
-		
+
 		reader.onload = () => {
 			this.setState({
 				file: file,
 				imagePreviewUrl: reader.result,
-				submitButton: 
+				submitButton:
 					<label className="btn  btn-primary col-sm-12 post-btn">
                     	Upload
                         <input
@@ -57,12 +72,15 @@ class WildLifeUploader extends React.Component {
 
 	_sendPhotoToServer(event) {
 		event.preventDefault();
+		if (!this.wildlifetype || !this.state.wildlifeId[this.wildlifetype]) {
+			alert("Please select a wildlife type");
+			return;
+		}
 		var formData = new FormData();
-		//formData.append('wildlife_id', this.props.trail_id);
-		formData.append('image', this.state.file);
-		// tested upload_route_image;
-		// fetch('http://127.0.0.1:5000/api/upload_wildlife_image', 
-		// 	  {method: 'POST', body: formData});
+		formData.append('wildlife_id', this.state.wildlifeId[this.wildlifetype]);
+		formData.append('wildlife_image', this.state.file);
+		fetch(Config.backendServerURL + '/api/upload_wildlife_image',
+			  {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
 	}
 
@@ -73,19 +91,30 @@ class WildLifeUploader extends React.Component {
 		if (imagePreviewUrl) {
 			imagePreview = <img className="preview-img" src={imagePreviewUrl} alt=""/>;
 		}
+		var surfaceboxes = this.state.wildlifeItems.map(
+            label => <Surfacebox
+                        label = {label}
+                        callback = {this.toggleSurfacebox}
+                        key = {label}
+                     />
+        );
 		return (
-			<div className="modal-dialog">	
+			<div className="modal-dialog">
 				<div className="modal-content">
 					<div className="modal-header">
 						<h4 className="modal-title">Upload Picture of Wildlife</h4>
-						<button type="button" 
+						<button type="button"
 								className="close"
                             	onClick={this.props.closeModal}>
                         	&times;
                         </button>
                     </div>
                     <div className="modal-body">
-						<p>For Trail "{this.props.trail_name}" </p>
+						<p>For Trail "{this.props.trail_name}"</p>
+						<p>Please select a wildlife type: </p>
+						<div className='wildlifebox'>
+		                    {surfaceboxes}
+		                </div>
 						<label className="btn  btn-primary col-sm-12 post-btn">
                     		Select a photo
                         	<input
@@ -101,10 +130,10 @@ class WildLifeUploader extends React.Component {
                     	{this.state.submitButton}
                     </div>
                     <div className="modal-footer">
-                    	<button type="button" 
-                    			className="btn btn-default" 
-                    			onClick={this.props.closeModal}> 
-                    		Close 
+                    	<button type="button"
+                    			className="btn btn-default"
+                    			onClick={this.props.closeModal}>
+                    		Close
                     	</button>
                     </div>
 				</div>
