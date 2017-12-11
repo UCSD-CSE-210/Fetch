@@ -14,12 +14,11 @@ class Post extends React.Component {
         var images = [];
         this.props.value.images.forEach(
             item => {
-                images.push(Config.backendServerURL + item.image_url);          
+                images.push(Config.backendServerURL + item.image_url);
             }
         );
         this.state = {
             mapURL : "http://placehold.it/400x20undefined1",
-            wildlifeInfo : "",
             modal : null,
             photoIndex: 0,
             isOpen: false,
@@ -88,22 +87,20 @@ class Post extends React.Component {
             fetch(Config.backendServerURL + `/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
-                    let wildlife = [];
                     let wildlifeImages = [];
                     data.results.forEach(
                         (item, index) => {
-                            wildlife.push(<div> {item.wildlifetype.name} <br/> </div>);
                             wildlifeImages.push(Config.backendServerURL + item.images[0].image_url);
                         }
                     );
-                    
+
                     if (data.results && data.results.length > 0) {
                         this.setState(
                             {
                                 wildlifeWarning:
                                 <div>
-                                    <img className="img-responsive wildlife-icon" 
-                                         src={require("./wildlifeWarning.svg")} 
+                                    <img className="img-responsive wildlife-icon"
+                                         src={require("./wildlifeWarning.svg")}
                                          alt="wildlife warning sign"
                                          onClick={() => {
                                             this.setState({showWildlifeImages: true})
@@ -112,15 +109,14 @@ class Post extends React.Component {
                             }
                         );
                         this.setState({wildlifeImages: wildlifeImages});
-                        this.setState({wildlifeInfo:  <div> Wildlife: {wildlife} </div>});
                     }
-                });           
+                });
         }
     }
 
     _submitWildlife(event) {
         event.preventDefault();
-        this.setState({modal: <WildLifeUploader 
+        this.setState({modal: <WildLifeUploader
                                 trail_id = {this.props.value.id}
                                 trail_name = {this.props.value.name}
                                 closeModal = {this.closeModal}
@@ -129,7 +125,7 @@ class Post extends React.Component {
 
     _submitDogPicture(event) {
         event.preventDefault();
-        this.setState({modal: <DogPictureUploader 
+        this.setState({modal: <DogPictureUploader
                                 trail_id = {this.props.value.id}
                                 trail_name = {this.props.value.name}
                                 closeModal = {this.closeModal}
@@ -151,9 +147,11 @@ class Post extends React.Component {
             this.setState({likeCount: this.state.likeCount + 1});
             this.setState({likeAble: !this.state.likeAble});
             console.log(thumbsUp);
-            fetch(Config.backendServerURL + `/api/route_like?route_id=${this.props.value.id}`, 
+            var formData = new FormData();
+            formData.append('route_id', this.props.value.id);
+            fetch(Config.backendServerURL + '/api/route_like',
                 {
-                    credentials: "same-origin"
+                    credentials: "same-origin", method: "POST", body: formData
                 }
             );
             thumbsUp.classList.add("liked");
@@ -204,7 +202,6 @@ class Post extends React.Component {
                                 Water: {this._yesOrNo(info.is_water)}<br/>
                                 Distance: {this._displayDistance(info.distance)}<br/>
                                 Surface: {info.surface}<br/>
-                                {this.state.wildlifeInfo}
                             </p>
                         </div>
                         <div className="post-img">
@@ -215,13 +212,13 @@ class Post extends React.Component {
                                 onClick={() => this.setState({isOpen: true})}
                             />
                         </div>
-                        
+
                         {isOpen &&
                             <Lightbox className="post-img"
                                 mainSrc={images[photoIndex]}
                                 nextSrc={images[(photoIndex + 1) % images.length]}
                                 prevSrc={images[(photoIndex + images.length - 1) % images.length]}
-         
+
                                 onCloseRequest={() => this.setState({ isOpen: false })}
                                 onMovePrevRequest={() => this.setState({
                                     photoIndex: (photoIndex + images.length - 1) % images.length,
@@ -235,9 +232,9 @@ class Post extends React.Component {
                             <Lightbox className="post-img"
                                 mainSrc={this.state.wildlifeImages[this.state.wildlifePhotoIndex]}
                                 nextSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + 1) % this.state.wildlifeImages.length]}
-                                prevSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1) 
+                                prevSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1)
                                                                     % this.state.wildlifeImages.length]}
-         
+
                                 onCloseRequest={() => this.setState({ showWildlifeImages: false })}
                                 onMovePrevRequest={() => this.setState({
                                     wildlifePhotoIndex: (this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1) % this.state.wildlifeImages.length,
