@@ -5,28 +5,40 @@ import WildLifeUploader from './WildLifeUploader'
 import DogPictureUploader from './DogPictureUploader'
 import Lightbox from 'react-image-lightbox';
 import Weatherbox from './Weatherbox';
+import Config from '../../Config'
 
 class Post extends React.Component {
 
     constructor(props) {
         super(props);
+        var images = [];
+        this.props.value.images.forEach(
+            item => {
+                images.push(Config.backendServerURL + item.image_url);          
+            }
+        );
         this.state = {
-            imgs : "http://placehold.it/400x20undefined1",
             mapURL : "http://placehold.it/400x20undefined1",
             wildlifeInfo : "",
             modal : null,
             photoIndex: 0,
             isOpen: false,
-            images: [],
+            images: images,
             likeCount: this.props.value.like_count,
             canLike: this.props.value.can_like,
             likeAble: this.props.value.can_like,
+            wildlifeWarning: null,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
         this._submitDogPicture= this._submitDogPicture.bind(this);
         this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
+    }
+
+    componentDidMount() {
+        this._renderMap();
+        this._renderWildlife();
     }
 
     _renderMap() {
@@ -60,8 +72,23 @@ class Post extends React.Component {
         var viewpoint = `${center.center[0]},${center.center[1]},${center.zoom - 1.5}`;
 
         //wildlife
+        this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
+            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
+            `${viewpoint}/500x300?` +
+            `access_token=${this.token}`});
+    }
+
+    _renderWildlife(){
+        var info = this.props.value;
+        console.log(this.props.shouldShow);
         if (this.props.shouldShow.wildlife) {
-            fetch(`http://localhost:5000/api/wildlife?route=${info.id}`)
+            this.setState(
+                {
+                    wildlifeWarning:
+                    <img className="img-responsive wildlife-icon" src={require("./wildlifeWarning.svg")} alt="wildlife warning sign"/>,
+                }
+            );
+            fetch(Config.backendServerURL + `/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
                     let wildlife = []
@@ -71,32 +98,11 @@ class Post extends React.Component {
                         }
                     );
                     if (data.results && data.results.length > 0) {
-                        this.setState({wildlifeInfo:  <div> Wildlife: <br/>
-                                                          {wildlife}
-                                                      </div>
+                        this.setState({wildlifeInfo:  <div> Wildlife: {wildlife} </div>
                                                 });
                     }
                 });           
         }
-        this.setState({mapURL : "https://api.mapbox.com/styles/v1/mapbox/streets-v10/static/" +
-            'geojson(' + encodeURIComponent(JSON.stringify(geojson)) + ')/' +
-            `${viewpoint}/500x300?` +
-            `access_token=${this.token}`});
-    }
-
-    componentDidMount() {
-        fetch("https://dog.ceo/api/breed/retriever/golden/images/random")
-            .then(data => data.json())
-            .then(data => {
-                this.setState({imgs: data.message,
-                               images: this.state.images.concat([data.message])});
-                console.log(this.state.images);
-            });
-        this._renderMap();
-    }
-
-    _yesOrNo(boolValue) {
-        return (boolValue)? 'Yes' : 'No';
     }
 
     _submitWildlife(event) {
@@ -117,6 +123,11 @@ class Post extends React.Component {
                                 />});
     }
 
+    closeModal(event) {
+        event.preventDefault();
+        this.setState({modal: null});
+    }
+
     _like(event){
         event.preventDefault();
         var thumbsUp = document.getElementById("like_id" + this.props.value.id);
@@ -135,11 +146,9 @@ class Post extends React.Component {
         }
     }
 
-    closeModal(event) {
-        event.preventDefault();
-        this.setState({modal: null});
+    _yesOrNo(boolValue) {
+        return (boolValue)? 'Yes' : 'No';
     }
-
 
     _displayDistance(distance) {
         if (!distance)
@@ -160,8 +169,11 @@ class Post extends React.Component {
         return (
             <div className="post-card container">
                 <div className='row'>
-                    <h3 className='col-9'><b>{info.name}</b></h3>
-                    <Weatherbox className='col-3'/>
+                    <h3 className='col-5'><b>{info.name}</b></h3>
+                    <div className='col-3 wildlife-box'>
+                        {this.state.wildlifeWarning}
+                    </div>
+                    <Weatherbox className='col-4' weatherInfo={info.weather}/>
                 </div>
                 <div className="row">
                     <div className="col-sm-4">
@@ -170,8 +182,10 @@ class Post extends React.Component {
                                 Address: {info.address}<br/>
                                 Shade: {this._yesOrNo(info.is_shade)}<br/>
                                 Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
+                                Parking lot: {this._yesOrNo(info.has_parking_lot)}<br/>
                                 Water: {this._yesOrNo(info.is_water)}<br/>
-                                distance: {this._displayDistance(info.distance)}
+                                Distance: {this._displayDistance(info.distance)}<br/>
+                                Surface: {info.surface}<br/>
                                 {this.state.wildlifeInfo}
                             </p>
                         </div>

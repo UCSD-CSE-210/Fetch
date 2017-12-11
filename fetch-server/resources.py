@@ -110,6 +110,12 @@ class ImageField(fields.Raw):
                                 'image_url': url_for('download_image', image_id=img.id)},
                    imgs)
 
+class WildlifeImageField(fields.Raw):
+    def format(self, imgs):
+        return map(lambda img: {'image_id': img.id,
+                                'image_url': url_for('download_wildlife_image', image_id=img.id)},
+                   imgs)
+
 class WeatherField(fields.Raw):
     def format(self, weather):
         return {
@@ -148,7 +154,8 @@ wildlife_fields = {
     'id' : fields.Integer,
     'wildlifetype' : WildlifeTypeField,
     'location': LocationField,
-    'route': RouteField
+    'route': RouteField,
+    'images': WildlifeImageField(attribute='images')
 }
 
 weather_fields = {

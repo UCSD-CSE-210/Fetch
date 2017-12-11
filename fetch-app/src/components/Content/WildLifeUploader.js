@@ -1,5 +1,6 @@
 import React from 'react';
 import './WildLifeUploader.css'
+import Config from '../../Config'
 
 class WildLifeUploader extends React.Component {
 
@@ -13,6 +14,22 @@ class WildLifeUploader extends React.Component {
 		this._uploadPhoto = this._uploadPhoto.bind(this);
 		this._sendPhotoToServer = this._sendPhotoToServer.bind(this);
 	}
+
+	componentDidMount() {
+		var wildlifetype = [];
+	    fetch(Config.backendServerURL + '/api/wildlifetype?')
+                .then(data => data.json())
+                .then(data => {
+                	if (data.results) {
+                		data.results.forEach(
+                			item => {
+                				wildlifetype.push([item.name, item.id]);
+                			}
+                		);
+                	}
+                	console.log(wildlifetype);
+                });
+    }
 
 	_uploadPhoto(event) {
 		event.preventDefault();
@@ -85,7 +102,7 @@ class WildLifeUploader extends React.Component {
                     </div>
                     <div className="modal-footer">
                     	<button type="button" 
-                    			class="btn btn-default" 
+                    			className="btn btn-default" 
                     			onClick={this.props.closeModal}> 
                     		Close 
                     	</button>

@@ -2,17 +2,18 @@ import React from 'react';
 import "./SearchBar.css";
 import CheckBox from './CheckBox.js';
 import Surfacebox from './Surfacebox.js';
-
+import Config from '../../Config'
 
 const items = [
     'Is shaded?',
     'Has garbage can?',
+    'Has parking lot?',
     'Show wildlife?',
 ]
 
 const surfaceItems = [
     'trail',
-    'road',
+    'urban',
     'all',
 ]
 
@@ -28,6 +29,8 @@ class SearchBar extends React.Component {
         this.toggleCheckBox = this.toggleCheckBox.bind(this);
         this.surface = 'all';
         this.toggleSurfacebox = this.toggleSurfacebox.bind(this);
+        this._geoError = this._geoError.bind(this);
+        this._queryForm = this._queryForm.bind(this);
     }
 
     updateText(event) {
@@ -40,29 +43,62 @@ class SearchBar extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
+        if (this.state.radius && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this._queryForm, this._geoError);
+            return;
+        }
+        this._queryForm(null);
+    }
+
+    _geoError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                console.log("User denied the request for Geolocation.")
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("Location information is unavailable.")
+                break;
+            case error.TIMEOUT:
+                console.log("The request to get user location timed out.")
+                break;
+            default:
+                console.log("An unknown error occurred.")
+                break;
+        }
+        this._queryForm(null);
+    }
+
+    _queryForm(position) {
+
+        //cannot test geolocation on my virtual machine;
+        //will continue to test it on Chenyu's Side
+        console.log(position);
         let params = {
             'address': this.state.text,
-            //'radius' : this.state.radius,
         }
+        
         if (this.selectedCheckBoxes.has('Is shaded?')) {
             params['is_shade'] = true; 
         }
         if (this.selectedCheckBoxes.has('Has garbage can?')) {
             params['is_garbage_can'] = true;
         }
+        if (this.selectedCheckBoxes.has('Has parking lot?')) {
+            params['has_parking_lot'] = true;
+        }
         if (this.surface && this.surface !== 'all') {
             params['surface'] = this.surface;
         }
 
+        var shouldShow = {
+            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
+        }
+        
         let esc = encodeURIComponent
         let query = Object.keys(params)
              .map(k => esc(k) + '=' + esc(params[k]))
              .join('&')
-        var shouldShow = {
-            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
-        }
-        console.log(query);
-        fetch('http://127.0.0.1:5000/api/route?' + query)
+        fetch(Config.backendServerURL + '/api/route?' + query)
                 .then(data => data.json())
                 .then(data => {this.props.callback(data.results, shouldShow)});
     }
@@ -103,7 +139,7 @@ class SearchBar extends React.Component {
                         <input
                             className="address-input"
                             type = "text"
-                            placeholder = " city or zip code ..."
+                            placeholder = " zip code ..."
                             value = {this.state.text}
                             onChange = {this.updateText}
                         />
