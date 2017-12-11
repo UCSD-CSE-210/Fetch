@@ -103,10 +103,12 @@ class SearchBar extends React.Component {
         if (this.surface && this.surface !== 'all') {
             params['surface'] = this.surface;
         }
+        if (this.state.radius) {
+            params['radius'] = this.state.radius;
+        }
         if (position) {
             params['longitude'] = position.coords.longitude;
             params['latitude'] = position.coords.latitude;
-            params['radius'] = this.state.radius;
             console.log('show radius of ' +
                 this.state.radius + ' from ' +
                 position.coords.longitude +
