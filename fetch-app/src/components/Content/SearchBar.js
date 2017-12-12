@@ -205,13 +205,13 @@ class SearchBar extends React.Component {
                     <div>
                     <label>From:</label>
                     <input type="text" className="distance-input"
-                            placeholder = "min (miles)"
+                            placeholder = "miles"
                             value = {this.state.minDist}
                             onChange = {this.updatedMinDist}
                         />
                     <label>To:</label>
                     <input type="text" className="distance-input"
-                            placeholder = "max (miles)"
+                            placeholder = "miles"
                             value = {this.state.maxDist}
                             onChange = {this.updatedMaxDist}
                         />

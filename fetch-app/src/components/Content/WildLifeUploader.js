@@ -16,6 +16,8 @@ class WildLifeUploader extends React.Component {
 		};
 		this._uploadPhoto = this._uploadPhoto.bind(this);
 		this._sendPhotoToServer = this._sendPhotoToServer.bind(this);
+		this._getGPSThenSendPhotoToServer = this._getGPSThenSendPhotoToServer.bind(this);
+		this._geoError = this._geoError.bind(this);
 		this.toggleSurfacebox = this.toggleSurfacebox.bind(this);
 		this.wildlifetype = '';
 	}
@@ -61,7 +63,7 @@ class WildLifeUploader extends React.Component {
                     	Upload
                         <input
                             style={{"display": "none"}}
-                            onClick={this._sendPhotoToServer}
+                            onClick={this._getGPSThenSendPhotoToServer}
                         />
                     </label>,
 			});
@@ -70,19 +72,51 @@ class WildLifeUploader extends React.Component {
 		reader.readAsDataURL(file);
 	}
 
-	_sendPhotoToServer(event) {
+	_getGPSThenSendPhotoToServer(event) {
 		event.preventDefault();
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this._sendPhotoToServer, this._geoError);
+            return;
+        }
+        alert("Sorry! We cannot get your location from your browser");
+	}
+
+	_sendPhotoToServer(position) {
 		if (!this.wildlifetype || !this.state.wildlifeId[this.wildlifetype]) {
 			alert("Please select a wildlife type");
 			return;
 		}
 		var formData = new FormData();
-		formData.append('wildlife_id', this.state.wildlifeId[this.wildlifetype]);
+		formData.append('wildlife_type_id', this.state.wildlifeId[this.wildlifetype]);
+		formData.append('route_id', this.props.trail_id);
+		formData.append('latitude', position.coords.latitude);
+		formData.append('longitude', position.coords.longitude);
 		formData.append('wildlife_image', this.state.file);
 		fetch(Config.backendServerURL + '/api/upload_wildlife_image',
 			  {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
 	}
+
+    _geoError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                console.log("User denied the request for Geolocation.");
+                alert("Please enable your GPS!. We need your location to uploud wildlife images");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("Location information is unavailable.");
+                alert("Sorry! We cannot get your location from your browser");
+                break;
+            case error.TIMEOUT:
+                console.log("The request to get user location timed out.");
+                alert("Sorry! We cannot get your location from your browser");
+                break;
+            default:
+                console.log("An unknown error occurred.");
+                alert("Sorry! We cannot get your location from your browser");
+                break;
+        }
+    }
 
 	render() {
 
