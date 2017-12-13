@@ -18,6 +18,7 @@ class RouteManager():
                               'is_poop_bag']
         self.filters = [('name',         self.filter_name),
                         ('surface',      self.filter_surface),
+                        ('zipcode',      self.filter_zipcode),
                         ('min_distance', self.filter_min_distance),
                         ('max_distance', self.filter_max_distance)]
         self.zipcodes = utils.get_zipcodes()
@@ -46,7 +47,7 @@ class RouteManager():
         # ######################################################################
         latitude  = args['latitude']  if 'latitude'  in args else None
         longitude = args['longitude'] if 'longitude' in args else None
-        zipcode   = args['address']   if 'address'   in args else None
+        zipcode   = args['zipcode']   if 'zipcode'   in args else None
         
         sql_point = None
 
@@ -91,6 +92,9 @@ class RouteManager():
     
     def filter_name(self, q, name):
         return q.filter(Route.name.ilike('%'+name+'%'))
+      
+    def filter_zipcode(self, q, zipcode):
+        return q.filter(Route.zipcode == zipcode)
     
     def filter_address(self, q, address):
         return q.filter(Route.address.ilike('%'+address+'%'))

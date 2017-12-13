@@ -30,7 +30,7 @@ weather_manager = WeatherManager(db)
 search_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 search_parser.add_argument('id',              type=int,            store_missing=False)
 search_parser.add_argument('name',            type=str,            store_missing=False)
-search_parser.add_argument('address',         type=str,            store_missing=False)
+search_parser.add_argument('zipcode',         type=str,            store_missing=False)
 search_parser.add_argument('is_shade',        type=inputs.boolean, store_missing=False)
 search_parser.add_argument('is_water',        type=inputs.boolean, store_missing=False)
 search_parser.add_argument('is_garbage_can',  type=inputs.boolean, store_missing=False)
@@ -97,7 +97,7 @@ class RouteField(fields.Raw):
         return {
             'id': route.id,
             'name': route.name,
-            'address': route.address,
+            'zipcode': route.zipcode,
             'is_shade': route.is_shade,
             'is_water': route.is_water,
             'is_garbage_can': route.is_garbage_can,
@@ -130,6 +130,7 @@ route_fields = {
     'id'              : fields.Integer,
     'name'            : fields.String,
     'address'         : fields.String,
+    'zipcode'         : fields.String,
     'is_shade'        : fields.Boolean,
     'is_water'        : fields.Boolean,
     'is_garbage_can'  : fields.Boolean,
