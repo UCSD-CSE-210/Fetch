@@ -14,12 +14,11 @@ class Post extends React.Component {
         var images = [];
         this.props.value.images.forEach(
             item => {
-                images.push(Config.backendServerURL + item.image_url);          
+                images.push(Config.backendServerURL + item.image_url);
             }
         );
         this.state = {
             mapURL : "http://placehold.it/400x20undefined1",
-            wildlifeInfo : "",
             modal : null,
             photoIndex: 0,
             isOpen: false,
@@ -28,12 +27,16 @@ class Post extends React.Component {
             canLike: this.props.value.can_like,
             likeAble: this.props.value.can_like,
             wildlifeWarning: null,
+            showWildlifeImages: false,
+            wildlifeImages: [],
+            wildlifePhotoIndex: 0,
         }
         this.token = "pk.eyJ1IjoiZGNoZW4wMDUiLCJhIjoiY2o5aTQza3o2Mzd4OTMzbGc5ZGVxOGdjcyJ9.RweudrPAlw6K5vNijRoK5Q";
         this._submitWildlife = this._submitWildlife.bind(this);
         this._submitDogPicture= this._submitDogPicture.bind(this);
         this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this._renderWildlife = this._renderWildlife.bind(this);
     }
 
     componentDidMount() {
@@ -80,34 +83,46 @@ class Post extends React.Component {
 
     _renderWildlife(){
         var info = this.props.value;
-        console.log(this.props.shouldShow);
         if (this.props.shouldShow.wildlife) {
-            this.setState(
-                {
-                    wildlifeWarning:
-                    <img className="img-responsive wildlife-icon" src={require("./wildlifeWarning.svg")} alt="wildlife warning sign"/>,
-                }
-            );
             fetch(Config.backendServerURL + `/api/wildlife?route=${info.id}`)
                 .then(data => data.json())
                 .then(data => {
-                    let wildlife = []
+                    let wildlifeImages = [];
                     data.results.forEach(
                         (item, index) => {
-                            wildlife.push(<div> {item.wildlifetype.name} <br/> </div>);
+                            if (item.images) {
+                                item.images.forEach(
+                                    imgItem => {
+                                        wildlifeImages.push(Config.backendServerURL + imgItem.image_url);
+                                    }
+                                )
+                            }
                         }
                     );
+
                     if (data.results && data.results.length > 0) {
-                        this.setState({wildlifeInfo:  <div> Wildlife: {wildlife} </div>
-                                                });
+                        this.setState(
+                            {
+                                wildlifeWarning:
+                                <div>
+                                    <img className="img-responsive wildlife-icon"
+                                         src={require("./wildlifeWarning.svg")}
+                                         alt="wildlife warning sign"
+                                         onClick={() => {
+                                            this.setState({showWildlifeImages: true})
+                                        }}/>
+                                </div>
+                            }
+                        );
+                        this.setState({wildlifeImages: wildlifeImages});
                     }
-                });           
+                });
         }
     }
 
     _submitWildlife(event) {
         event.preventDefault();
-        this.setState({modal: <WildLifeUploader 
+        this.setState({modal: <WildLifeUploader
                                 trail_id = {this.props.value.id}
                                 trail_name = {this.props.value.name}
                                 closeModal = {this.closeModal}
@@ -116,7 +131,7 @@ class Post extends React.Component {
 
     _submitDogPicture(event) {
         event.preventDefault();
-        this.setState({modal: <DogPictureUploader 
+        this.setState({modal: <DogPictureUploader
                                 trail_id = {this.props.value.id}
                                 trail_name = {this.props.value.name}
                                 closeModal = {this.closeModal}
@@ -138,6 +153,13 @@ class Post extends React.Component {
             this.setState({likeCount: this.state.likeCount + 1});
             this.setState({likeAble: !this.state.likeAble});
             console.log(thumbsUp);
+            var formData = new FormData();
+            formData.append('route_id', this.props.value.id);
+            fetch(Config.backendServerURL + '/api/route_like',
+                {
+                    credentials: "same-origin", method: "POST", body: formData
+                }
+            );
             thumbsUp.classList.add("liked");
         }else if(!this.state.likeAble){
             this.setState({likeCount: this.state.likeCount - 1});
@@ -186,7 +208,6 @@ class Post extends React.Component {
                                 Water: {this._yesOrNo(info.is_water)}<br/>
                                 Distance: {this._displayDistance(info.distance)}<br/>
                                 Surface: {info.surface}<br/>
-                                {this.state.wildlifeInfo}
                             </p>
                         </div>
                         <div className="post-img">
@@ -197,19 +218,35 @@ class Post extends React.Component {
                                 onClick={() => this.setState({isOpen: true})}
                             />
                         </div>
-                        
+
                         {isOpen &&
                             <Lightbox className="post-img"
                                 mainSrc={images[photoIndex]}
                                 nextSrc={images[(photoIndex + 1) % images.length]}
                                 prevSrc={images[(photoIndex + images.length - 1) % images.length]}
-         
+
                                 onCloseRequest={() => this.setState({ isOpen: false })}
                                 onMovePrevRequest={() => this.setState({
                                     photoIndex: (photoIndex + images.length - 1) % images.length,
                                 })}
                                 onMoveNextRequest={() => this.setState({
                                     photoIndex: (photoIndex + 1) % images.length,
+                                })}
+                            />
+                        }
+                        {this.state.showWildlifeImages &&
+                            <Lightbox className="post-img"
+                                mainSrc={this.state.wildlifeImages[this.state.wildlifePhotoIndex]}
+                                nextSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + 1) % this.state.wildlifeImages.length]}
+                                prevSrc={this.state.wildlifeImages[(this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1)
+                                                                    % this.state.wildlifeImages.length]}
+
+                                onCloseRequest={() => this.setState({ showWildlifeImages: false })}
+                                onMovePrevRequest={() => this.setState({
+                                    wildlifePhotoIndex: (this.state.wildlifePhotoIndex + this.state.wildlifeImages.length - 1) % this.state.wildlifeImages.length,
+                                })}
+                                onMoveNextRequest={() => this.setState({
+                                    wildlifePhotoIndex: (this.state.wildlifePhotoIndex + 1) % this.state.wildlifeImages.length,
                                 })}
                             />
                         }

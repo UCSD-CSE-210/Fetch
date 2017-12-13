@@ -1,9 +1,20 @@
 .preview {
 	display: flex;
+	height: 200px;
     justify-content: center;
     margin-bottom: 2%;
 }
 
 .preview-img {
 	width: 80%;
+}
+
+.wildlifebox {
+	color: 0000;
+	display: flex;
+    justify-content: center;
+}
+
+.wildlifebox input{
+  margin-right: 5px;
 }

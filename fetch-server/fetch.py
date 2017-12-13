@@ -8,6 +8,7 @@ from models.route import Route, RouteAdmin
 from models.user import User, Role, UserAdmin
 from models.wildlife import WildlifeType, WildlifeTypeAdmin, Wildlife, WildlifeAdmin
 from models.weather import Weather, WeatherAdmin
+from managers.wildlife_manager import WildlifeManager
 
 from flask_login import current_user
 
@@ -21,6 +22,8 @@ app = utils.get_app()
 
 # Initialize sqlalchemy here
 db = utils.get_db()
+
+wildlife_manager = WildlifeManager(db)
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -129,12 +132,15 @@ def upload_image():
 def upload_wildlife_image():
     if request.method == 'POST':
         wildlife_id = request.form.get('wildlife_id', default=-1, type=int)
-        if wildlife_id < 0:
-            return failure_msg('Missing wildlife id')
+        
+        wildlife_type_id = request.form.get('wildlife_type_id', type=int)
+        lat = request.form.get('latitude', type=float)
+        lon = request.form.get('longitude', type=float)
+        route_id = request.form.get('route_id', type=int)
+        wildlife = wildlife_manager.insert(lat, lon, wildlife_type_id, route_id)
+
         if 'wildlife_image' not in request.files:
             return failure_msg('Missing image')
-        
-        wildlife = Wildlife.query.get(wildlife_id)
 
         if wildlife is None:
             return failure_msg('Wildlife "%d" does not exist' % (wildlife_id))

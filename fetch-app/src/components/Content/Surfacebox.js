@@ -6,12 +6,13 @@ class Surfacebox extends React.Component {
 
     constructor(props) {
         super(props);
-        this.isChecked = false;
+        this.checked = this.props.defaultChecked;
+        if (this.checked === null)
+            this.checked = false;
         this.toggleCheckBoxChange = this.toggleCheckBoxChange.bind(this);
     }
 
     toggleCheckBoxChange(event) {
-        this.isChecked = !this.isChecked;
         this.props.callback(this.props.label);
     }
 
@@ -24,6 +25,7 @@ class Surfacebox extends React.Component {
                     name="surface"
                     value={label}
                     onClick={this.toggleCheckBoxChange}
+                    defaultChecked={this.checked}
                 />{label}
             </label>
         );
