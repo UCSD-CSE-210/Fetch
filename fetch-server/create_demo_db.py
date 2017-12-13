@@ -88,6 +88,7 @@ def build_demo_db(db):
         rattlesnake = wtm.insert("Rattlesnake", True)
         raccoon     = wtm.insert("Raccoon",     True)
         coyote      = wtm.insert("Coyote",      True)
+        otherwl     = wtm.insert("Other",       True)
 
         rs_tup = (rattlesnake, "rattlesnake.jpg")
         rc_tup = (raccoon,     "raccoon.jpg")
