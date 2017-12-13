@@ -48,8 +48,6 @@ class Weatherbox extends React.Component {
                 break;
             case 'Rainy':
                 this.setState({icon: require('./weather/rainy.svg')});
-                this.setState({shouldWarn: true});
-                this.setState({alertMsg: "It's raining on this route now, you may want to reconsider!"});
                 break;
             case 'Windy':
                 this.setState({icon: require('./weather/windy.svg')});
