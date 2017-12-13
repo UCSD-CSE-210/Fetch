@@ -205,6 +205,7 @@ class Post extends React.Component {
                                 Shade: {this._yesOrNo(info.is_shade)}<br/>
                                 Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
                                 Parking lot: {this._yesOrNo(info.has_parking_lot)}<br/>
+                                Poop bag: {this._yesOrNo(info.is_poop_bag)}<br/>
                                 Water: {this._yesOrNo(info.is_water)}<br/>
                                 Distance: {this._displayDistance(info.distance)}<br/>
                                 Surface: {info.surface}<br/>
