@@ -90,7 +90,13 @@ class Post extends React.Component {
                     let wildlifeImages = [];
                     data.results.forEach(
                         (item, index) => {
-                            wildlifeImages.push(Config.backendServerURL + item.images[0].image_url);
+                            if (item.images) {
+                                item.images.forEach(
+                                    imgItem => {
+                                        wildlifeImages.push(Config.backendServerURL + imgItem.image_url);
+                                    }
+                                )
+                            }
                         }
                     );
 

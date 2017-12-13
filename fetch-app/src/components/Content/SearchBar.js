@@ -8,7 +8,6 @@ const items = [
     'Is shaded?',
     'Has garbage can?',
     'Has parking lot?',
-    'Show wildlife?',
 ]
 
 const surfaceItems = [
@@ -125,7 +124,7 @@ class SearchBar extends React.Component {
         }
 
         var shouldShow = {
-            wildlife : this.selectedCheckBoxes.has('Show wildlife?'),
+            wildlife : true,
         }
 
         let esc = encodeURIComponent
