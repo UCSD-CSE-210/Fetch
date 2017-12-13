@@ -123,7 +123,7 @@ class WildLifeUploader extends React.Component {
 		let {imagePreviewUrl} = this.state;
 		let imagePreview = null;
 		if (imagePreviewUrl) {
-			imagePreview = <img className="preview-img" src={imagePreviewUrl} alt=""/>;
+			imagePreview = <img className="preview-img img-responsive" src={imagePreviewUrl} alt=""/>;
 		}
 		var surfaceboxes = this.state.wildlifeItems.map(
             label => <Surfacebox
