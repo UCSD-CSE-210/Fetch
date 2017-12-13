@@ -153,7 +153,7 @@ def build_demo_db(db):
                                                                  "06_n02091635_2089.jpg"],
                                                    "likes"    : [user1, user3]}, 
 
-                  'Deerfield loop'              : {"wildlife" : [],
+                  'Deerfield Loop'              : {"wildlife" : [],
                                                    "route"    : ["07_n02093754_6453.jpg",
                                                                  "08_n02094258_2842.jpg"],
                                                    "likes"    : [user1, user2, user3]}, 
