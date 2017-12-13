@@ -8,6 +8,8 @@ const items = [
     'Is shaded?',
     'Has garbage can?',
     'Has parking lot?',
+    'Has poop bag?',
+    'Has drinking water for dogs?',
 ]
 
 const surfaceItems = [
@@ -87,7 +89,7 @@ class SearchBar extends React.Component {
         //cannot test geolocation on my virtual machine;
         //will continue to test it on Chenyu's Side
         let params = {
-            'address': this.state.text,
+            'zipcode': this.state.text,
         }
 
         if (this.selectedCheckBoxes.has('Is shaded?')) {
@@ -104,6 +106,12 @@ class SearchBar extends React.Component {
         }
         if (this.state.radius) {
             params['radius'] = this.state.radius;
+        }
+        if (this.selectedCheckBoxes.has('Has poop bag?')) {
+            params['is_poop_bag'] = true;
+        }
+        if  (this.selectedCheckBoxes.has('Has drinking water for dogs?')) {
+            params['is_water'] = true;
         }
         if (position) {
             params['longitude'] = position.coords.longitude;
