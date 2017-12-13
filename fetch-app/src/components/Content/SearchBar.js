@@ -165,6 +165,7 @@ class SearchBar extends React.Component {
                         label = {label}
                         callback = {this.toggleSurfacebox}
                         key = {label}
+                        defaultChecked = {label === 'all'}
                      />
         );
 
