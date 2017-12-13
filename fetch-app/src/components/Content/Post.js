@@ -37,6 +37,9 @@ class Post extends React.Component {
         this._like = this._like.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this._renderWildlife = this._renderWildlife.bind(this);
+        this.updateWildlifeImage = this.updateWildlifeImage.bind(this);
+        this.updateDogImage = this.updateDogImage.bind(this);
+        this._showWildlifeWarning = this._showWildlifeWarning.bind(this);
     }
 
     componentDidMount() {
@@ -101,23 +104,27 @@ class Post extends React.Component {
                     );
 
                     if (data.results && data.results.length > 0) {
-                        this.setState(
-                            {
-                                wildlifeWarning:
-                                <div>
-                                    <img className="img-responsive wildlife-icon"
-                                         src={require("./wildlifeWarning.svg")}
-                                         alt="wildlife warning sign"
-                                         onClick={() => {
-                                            this.setState({showWildlifeImages: true})
-                                        }}/>
-                                </div>
-                            }
-                        );
+                        this._showWildlifeWarning();
                         this.setState({wildlifeImages: wildlifeImages});
                     }
                 });
         }
+    }
+
+    _showWildlifeWarning() {
+        this.setState(
+            {
+                wildlifeWarning:
+                <div>
+                    <img className="img-responsive wildlife-icon"
+                         src={require("./wildlifeWarning.svg")}
+                         alt="wildlife warning sign"
+                         onClick={() => {
+                            this.setState({showWildlifeImages: true})
+                        }}/>
+                </div>
+            }
+        );
     }
 
     _submitWildlife(event) {
@@ -126,6 +133,7 @@ class Post extends React.Component {
                                 trail_id = {this.props.value.id}
                                 trail_name = {this.props.value.name}
                                 closeModal = {this.closeModal}
+                                updateWildlifeImage = {this.updateWildlifeImage}
                                 />});
     }
 
@@ -135,12 +143,26 @@ class Post extends React.Component {
                                 trail_id = {this.props.value.id}
                                 trail_name = {this.props.value.name}
                                 closeModal = {this.closeModal}
+                                updateDogImage = {this.updateDogImage}
                                 />});
     }
 
     closeModal(event) {
         event.preventDefault();
         this.setState({modal: null});
+    }
+
+    updateWildlifeImage(url) {
+        if (url) {
+            this._showWildlifeWarning();
+            this.setState({wildlifeImages: this.state.wildlifeImages.concat(url)});
+        }
+    }
+
+    updateDogImage(url) {
+        if (url) {
+            this.setState({images: this.state.images.concat(url)});
+        }
     }
 
     _like(event){

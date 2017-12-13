@@ -86,6 +86,7 @@ class WildLifeUploader extends React.Component {
 			alert("Please select a wildlife type");
 			return;
 		}
+		this.props.updateWildlifeImage(this.state.imagePreviewUrl);
 		var formData = new FormData();
 		formData.append('wildlife_type_id', this.state.wildlifeId[this.wildlifetype]);
 		formData.append('route_id', this.props.trail_id);

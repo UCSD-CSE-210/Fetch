@@ -47,6 +47,7 @@ class DogPictureUploader extends React.Component {
 		fetch(Config.backendServerURL + '/api/upload_route_image',
 			   {method: 'POST', body: formData});
 		this.setState({file: null, imagePreviewUrl: null, submitButton: null});
+		this.props.updateDogImage(this.state.imagePreviewUrl);
 	}
 
 	render() {
@@ -85,7 +86,7 @@ class DogPictureUploader extends React.Component {
                     </div>
                     <div className="modal-footer">
                     	<button type="button"
-                    			className="btn btn-default" 
+                    			className="btn btn-default"
                     			onClick={this.props.closeModal}>
                     		Close
                     	</button>
