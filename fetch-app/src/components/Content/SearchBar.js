@@ -89,9 +89,10 @@ class SearchBar extends React.Component {
         //cannot test geolocation on my virtual machine;
         //will continue to test it on Chenyu's Side
         let params = {
-            'zipcode': this.state.text,
         }
-
+        if (this.state.text) {
+            params['zipcode'] = this.state.text;
+        }
         if (this.selectedCheckBoxes.has('Is shaded?')) {
             params['is_shade'] = true;
         }
