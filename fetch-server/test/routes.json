@@ -1,19 +1,21 @@
 [
     {
         "name": "Rose Canyon",
-        "address": "92122",
+        "address": "Regents Drive, San Diego, CA 92122",
+        "zipcode": "92122",
         "is_shade": false,
         "is_water": false,
         "is_garbage_can": true,
         "is_poop_bag": true,
-        "has_parking_lot": true,
+        "has_parking_lot": false,
         "surface": "trail",
         "weather": {"temperature": 75, "sunny": true, "cloudy": false, "rainy": false},
         "pathstr": "LINESTRING(-117.2114610672 32.861420709385,-117.220730781555 32.8578879092445,-117.229228019714 32.8542107637502,-117.233347892761 32.8502450438791,-117.235407829285 32.8465675816218,-117.235836982727 32.8437553017765,-117.234206199646 32.8395006577654,-117.233862876892 32.8391400853402)"
     },
     {
         "name": "Torrey Pines",
-        "address": "92122",
+        "zipcode": "92037",
+        "address": "12600 North Torrey Pines Road, La Jolla, CA 92037",
         "is_shade": true,
         "is_water": false,
         "is_garbage_can": false,
@@ -25,9 +27,10 @@
     },
     {
         "name": "La Jolla Shores",
-        "address": "92122",
+        "zipcode": "92037",
+        "address": "8300 Camino Del Oro, La Jolla, CA 92037",
         "is_shade": false,
-        "is_water": false,
+        "is_water": true,
         "is_garbage_can": true,
         "is_poop_bag": false,
         "has_parking_lot": true,
@@ -36,8 +39,9 @@
         "pathstr": "LINESTRING(-117.2540974617 32.8662510451088,-117.253196239471 32.8703241834467,-117.252037525177 32.8726310106628,-117.251179218292 32.8750459060983,-117.251393795013 32.8787221877715,-117.251608371735 32.8804881904389,-117.252681255341 32.8827226739976)"
     },
     {
-        "name": "Deerfield loop",
-        "address": "92119",
+        "name": "Deerfield Loop",
+        "zipcode": "92124",
+        "address": "Deerfield BMX Loop, San Diego, CA 92124",
         "is_shade": true,
         "is_water": false,
         "is_garbage_can": true,
@@ -49,7 +53,8 @@
     },
     {
         "name": "Mission Trails Visitor Loop",
-        "address": "92119",
+        "zipcode": "92119",
+        "address": "1 Father Junipero Serra Trail, San Diego, CA 92119",
         "is_shade": true,
         "is_water": false,
         "is_garbage_can": true,
@@ -61,7 +66,8 @@
     },
     {
         "name": "Cowles Mountain Trail",
-        "address": "92119",
+        "zipcode": "92119",
+        "address": "1 Father Junipero Serra Trail, San Diego, CA 92119",
         "is_shade": false,
         "is_water": false,
         "is_garbage_can": false,
@@ -73,7 +79,8 @@
     },
     {
         "name": "Balboa Park",
-        "address": "92101",
+        "zipcode": "92101",
+        "address": "1549 El Prado, San Diego, CA 92101",
         "is_shade": false,
         "is_water": false,
         "is_garbage_can": true,
@@ -85,7 +92,8 @@
     },
     {
         "name": "Par Course Trails",
-        "address": "92122",
+        "zipcode": "92122",
+        "address": "1200 Magical Land, San Diego, CA 92122",
         "is_shade": false,
         "is_water": false,
         "is_garbage_can": true,
@@ -94,17 +102,5 @@
         "surface": "trail",
         "weather": {"temperature": 60, "sunny": false, "cloudy": false, "rainy": true},
         "pathstr": "LINESTRING(-117.238385081291 32.8834975220764,-117.238191962242 32.8837948457034,-117.237387299538 32.8836506889179,-117.237280011177 32.8839299924769,-117.237065434456 32.8839390022544,-117.236732840538 32.8841372171292,-117.236689925194 32.8843714705005,-117.237387299538 32.885038188245,-117.237344384193 32.8852093717215,-117.23705470562 32.8853715452362,-117.23680794239 32.8855156992224,-117.236765027046 32.8858040064913,-117.236786484718 32.886299532418,-117.237140536308 32.8865788276284,-117.23705470562 32.8868671314384,-117.237440943718 32.8870202924559,-117.237601876259 32.8870743492224,-117.2377628088 32.8864707134579,-117.237945199013 32.884894033482,-117.238095402718 32.8843084023461,-117.238181233406 32.8839480120311,-117.238320708275 32.8835515809919)"
-    },
-    {
-        "name": "UCSD",
-        "address": "92122",
-        "is_shade": false,
-        "is_water": true,
-        "is_garbage_can": true,
-        "is_poop_bag": false,
-        "has_parking_lot": true,
-        "surface": "trail",
-        "weather": {"temperature": 75, "sunny": true, "cloudy": false, "rainy": false},
-        "pathstr": "LINESTRING(-117.233954071999 32.8820469288637,-117.234104275703 32.8817946493596,-117.234104275703 32.8809927561667,-117.235563397408 32.8809927561667,-117.237580418587 32.879307855821,-117.237569689751 32.8791907225207,-117.238685488701 32.8781455262187,-117.238827645779 32.8781365158522,-117.238913476467 32.8775508400632,-117.239235341549 32.8776184182363)"
     }
 ]

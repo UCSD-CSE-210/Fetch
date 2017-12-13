@@ -35,14 +35,13 @@ class RouteTestCase(FetchTestCase):
   def test_empty(self):
     with self.app.app_context():
       rs = self.manager.search({})
-      self.assertEqual(len(rs), 9)
+      self.assertEqual(len(rs), 8)
 
-      names = ["UCSD", 
-               "Par Course Trails", 
+      names = ["Par Course Trails", 
                "Torrey Pines", 
                "La Jolla Shores", 
                "Rose Canyon", 
-               "Deerfield loop",
+               "Deerfield Loop",
                "Mission Trails Visitor Loop",
                "Balboa Park",
                "Cowles Mountain Trail"]
@@ -53,25 +52,23 @@ class RouteTestCase(FetchTestCase):
   def test_ordering(self):
     with self.app.app_context():
       routes = self.manager.search(self.ucsd_cse_latlong)
-      names  = ["UCSD", 
-                "Par Course Trails", 
+      names  = ["Par Course Trails", 
                 "Torrey Pines", 
                 "La Jolla Shores", 
                 "Rose Canyon", 
-                "Deerfield loop",
+                "Deerfield Loop",
                 "Mission Trails Visitor Loop",
                 "Balboa Park",
                 "Cowles Mountain Trail"] 
       self.assertEqual(map(lambda r: r.name, routes), names)
 
       routes2 = self.manager.search(self.petco_latlong)
-      names2  = ["UCSD", 
-                 "Rose Canyon",
+      names2  = ["Rose Canyon",
                  "Par Course Trails", 
                  "La Jolla Shores", 
                  "Torrey Pines", 
                  "Balboa Park", 
-                 "Deerfield loop", 
+                 "Deerfield Loop", 
                  "Mission Trails Visitor Loop", 
                  "Cowles Mountain Trail"]
       self.assertEqual(map(lambda r: r.name, routes2), names2)
@@ -85,13 +82,12 @@ class RouteTestCase(FetchTestCase):
   def test_radius_ucsd_1(self):
     self.radius_tester(self.ucsd_cse_latlong,
                        1,
-                       ["UCSD", "Par Course Trails"])
+                       ["Par Course Trails"])
 
   def test_radius_ucsd_2(self):
     self.radius_tester(self.ucsd_cse_latlong,
                        2,
-                       ["UCSD", 
-                        "Par Course Trails", 
+                       ["Par Course Trails", 
                         "Torrey Pines", 
                         "La Jolla Shores", 
                         "Rose Canyon"])
@@ -99,13 +95,12 @@ class RouteTestCase(FetchTestCase):
   def test_radius_petco_1(self):
     self.radius_tester(self.petco_latlong,
                        1,
-                       ["UCSD", "Rose Canyon"])
+                       ["Rose Canyon"])
 
   def test_radius_petco_2(self):
     self.radius_tester(self.petco_latlong,
                        2,
-                       ["UCSD", 
-                        "Rose Canyon",
+                       ["Rose Canyon",
                         "Par Course Trails", 
                         "La Jolla Shores", 
                         "Torrey Pines"])
@@ -130,6 +125,7 @@ class RouteTestCase(FetchTestCase):
 
         rt = Route(name            = r['name'],
                    address         = r['address'],
+                   zipcode         = r['zipcode'],
                    is_shade        = r['is_shade'],
                    is_water        = r['is_water'],
                    is_garbage_can  = r['is_garbage_can'],

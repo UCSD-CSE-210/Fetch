@@ -116,6 +116,7 @@ def build_demo_db(db):
 
                 rt = Route(name            = name,
                            address         = str(r['address']),
+                           zipcode         = str(r['zipcode']),
                            is_shade        = r['is_shade'],
                            is_water        = r['is_water'],
                            is_garbage_can  = r['is_garbage_can'],
