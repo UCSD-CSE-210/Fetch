@@ -223,14 +223,14 @@ class Post extends React.Component {
                     <div className="col-sm-4">
                         <div>
                             <p>
-                                Address: {info.address}<br/>
-                                Shade: {this._yesOrNo(info.is_shade)}<br/>
-                                Garbage can: {this._yesOrNo(info.is_garbage_can)}<br/>
-                                Parking lot: {this._yesOrNo(info.has_parking_lot)}<br/>
-                                Poop bag: {this._yesOrNo(info.is_poop_bag)}<br/>
-                                Water: {this._yesOrNo(info.is_water)}<br/>
-                                Distance: {this._displayDistance(info.distance)}<br/>
-                                Surface: {info.surface}<br/>
+                                <span><b>Address</b></span>: {info.address}<br/>
+                                <span><b>Shade</b></span>: {this._yesOrNo(info.is_shade)}<br/>
+                                <span><b>Garbage can</b></span>: {this._yesOrNo(info.is_garbage_can)}<br/>
+                                <span><b>Parking lot</b></span>: {this._yesOrNo(info.has_parking_lot)}<br/>
+                                <span><b>Poop bag</b></span>: {this._yesOrNo(info.is_poop_bag)}<br/>
+                                <span><b>Water</b></span>: {this._yesOrNo(info.is_water)}<br/>
+                                <span><b>Distance</b></span>: {this._displayDistance(info.distance)}<br/>
+                                <span><b>Surface</b></span>: {info.surface}<br/>
                             </p>
                         </div>
                         <div className="post-img">
