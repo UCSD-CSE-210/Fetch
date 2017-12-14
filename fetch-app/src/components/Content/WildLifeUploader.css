@@ -1,12 +1,11 @@
 .preview {
 	display: flex;
-	height: 200px;
     justify-content: center;
     margin-bottom: 2%;
 }
 
 .preview-img {
-	width: 80%;
+	height: 80%;
 }
 
 .wildlifebox {
