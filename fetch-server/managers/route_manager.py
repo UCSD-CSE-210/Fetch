@@ -18,7 +18,6 @@ class RouteManager():
                               'is_poop_bag']
         self.filters = [('name',         self.filter_name),
                         ('surface',      self.filter_surface),
-                        ('zipcode',      self.filter_zipcode),
                         ('min_distance', self.filter_min_distance),
                         ('max_distance', self.filter_max_distance)]
         self.zipcodes = utils.get_zipcodes()
@@ -50,6 +49,9 @@ class RouteManager():
         zipcode   = args['zipcode']   if 'zipcode'   in args else None
         
         sql_point = None
+        
+        if zipcode is not None and 'radius' not in args:
+            q = self.filter_zipcode(q, zipcode)
 
         if latitude is not None and longitude is not None:
             sql_point = self.latlong_to_sql({'latitude'  : latitude,
